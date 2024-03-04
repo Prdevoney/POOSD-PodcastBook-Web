@@ -14,7 +14,7 @@
 
 
   ## React App
-  To develop locally go to the client directory and start the development server with:
+  To develop locally: go to the client directory and start the development server with:
   ```
   cd client
   npm start
@@ -30,7 +30,7 @@
       - User can view friends reviews
 
    ## Backend (APIs)
-  To develop locally, from the main directory start the development server with:
+  To develop locally: from the main directory start the development server with:
   ```
   npm run dev
   ```
