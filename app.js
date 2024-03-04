@@ -19,7 +19,7 @@ app.use(cookieParser());
 
 // Define routes
 app.use('/api/test/', indexRouter);
-app.use('/house', usersRouter);
+app.use('/house/boat', usersRouter);
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
