@@ -1,0 +1,8 @@
+{
+    "appService.zipIgnorePattern": [
+        "node_modules{,/**}",
+        ".vscode{,/**}"
+    ],
+    "appService.defaultWebAppToDeploy": "/subscriptions/19868676-96d8-4db6-8df1-989fb068b805/resourceGroups/Test/providers/Microsoft.Web/sites/podcastd-test",
+    "appService.deploySubpath": "."
+}
