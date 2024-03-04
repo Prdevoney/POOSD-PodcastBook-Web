@@ -10,7 +10,7 @@
   Contains the React project where we can work on the front end
 
 * routes folder: 
-  Contains the server side code (APIs)
+  Contains the server side code (APIs).
 
 
   ## React App
