@@ -12,7 +12,13 @@
 * routes folder: 
   Contains the server side code (APIs)
 
-
+  ## Cloning the Repo
+  Once you clone the repo in the main directory run:
+  ```
+  npm install
+  ```
+  This will install all the necessary packages for you to develop and test the code locally
+  
   ## React App
   To develop locally: go to the client directory and start the development server with:
   ```
@@ -28,8 +34,8 @@
   * **User Page**
       - User can view their own reviews
       - User can view friends reviews
-
-   ## Backend (APIs)
+  
+  ## Backend (APIs)
   To develop locally: from the main directory start the development server with:
   ```
   npm run dev
@@ -37,6 +43,9 @@
   ### API Structure
   * The request is processed by the app.js file in the main directory
   * From there it routes the request to the proper file and endpoint in the 'routes' folder
+  * Link for the podcast API: https://www.listennotes.com/api/docs/
+ 
+ 
   
 
   
