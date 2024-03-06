@@ -5,7 +5,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var podcastRouter = require('./routes/podcast');
 
 var app = express();
 
@@ -19,18 +19,14 @@ app.use(cookieParser());
 
 // Define routes
 app.use('/api/test/', indexRouter);
-app.use('/house/boat', usersRouter);
+app.use('/podcast', podcastRouter);
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
-// app.get('*', (req, res) => {
-//   res.sendFile(path.join(__dirname, 'client/build/index.html'));
-// });
-
-// Serve React's index.html file only for the base URL
-app.get('/', (req, res) => {
+app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client/build/index.html'));
 });
+
 
 /// catch 404 and forward to error handler
 app.use(function(req, res, next) {
