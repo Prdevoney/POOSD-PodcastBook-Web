@@ -25,6 +25,8 @@
   cd client
   npm start
   ```
+  This will run the React app on localhost:3000
+  
   ### Website Structure
   * **Login page**
       - User can create account and login
@@ -40,6 +42,8 @@
   ```
   npm run dev
   ```
+  This will run the server (Express.js app) on localhost:5000
+  
   ### API Structure
   * The request is processed by the app.js file in the main directory
   * From there it routes the request to the proper file and endpoint in the 'routes' folder
