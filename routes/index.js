@@ -58,6 +58,7 @@ router.post('/register', async (req, res) => {
 
 router.post('/login', async (req, res) => {
     try {
+      console.log("login");
         // Extract username and password from request body
         const { Username, Password } = req.body;
 
