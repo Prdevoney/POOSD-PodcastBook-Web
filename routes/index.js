@@ -14,6 +14,14 @@ router.get('/', function(req, res, next) {
   ]);
 });
 
+router.get('/testing', function(req, res, next) {
+  // Example response
+  res.json([
+    { id: 5, name: 'Dr. House' },
+    { id: 7, name: 'Dr. Chase' }
+  ]);
+});
+
 
 router.post('/register', async (req, res) => {
     try {
