@@ -6,23 +6,8 @@ const MongoClient = require("mongodb").MongoClient;
 const client = new MongoClient(url);
 client.connect(console.log("mongodb connected"));
 
-router.get('/', function(req, res, next) {
-  // Example response
-  res.json([
-    { id: 4, name: 'John Doe' },
-    { id: 8, name: 'Jane Doe' }
-  ]);
-});
 
-router.get('/testing', function(req, res, next) {
-  // Example response
-  res.json([
-    { id: 5, name: 'Dr. House' },
-    { id: 7, name: 'Dr. Chase' }
-  ]);
-});
-
-
+// API for registering a new user
 router.post('/register', async (req, res) => {
     try {
         const { Email, Username, Password } = req.body;
@@ -64,6 +49,8 @@ router.post('/register', async (req, res) => {
     }
 });
 
+
+// API for logging in a user
 router.post('/login', async (req, res) => {
     try {
       console.log("login");
