@@ -23,7 +23,12 @@ app.use('/house/boat', usersRouter);
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
-app.get('*', (req, res) => {
+// app.get('*', (req, res) => {
+//   res.sendFile(path.join(__dirname, 'client/build/index.html'));
+// });
+
+// Serve React's index.html file only for the base URL
+app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'client/build/index.html'));
 });
 
