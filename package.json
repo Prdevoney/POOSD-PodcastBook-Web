@@ -1,3 +1,28 @@
+<<<<<<< HEAD
+{
+  "name": "podcastbook",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "dev": "nodemon ./bin/www",
+    "build": "cd client && npm install && npm run build",
+    "postinstall": "npm run build"
+  },
+  "dependencies": {
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "ejs": "~2.6.1",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "mongodb": "^6.4.0",
+    "morgan": "~1.9.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
+=======
 {
   "name": "podcastbook",
   "version": "0.0.0",
@@ -22,3 +47,4 @@
     "nodemon": "^3.1.0"
   }
 }
+>>>>>>> 00d3f43e23e8cf2c2009ee4c5dff37946daee85f
