@@ -9,6 +9,7 @@
     "postinstall": "npm run build"
   },
   "dependencies": {
+    "bootstrap": "^5.3.3",
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "ejs": "~2.6.1",
