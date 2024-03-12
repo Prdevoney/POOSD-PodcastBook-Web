@@ -1,6 +1,11 @@
 import './App.css';
 import LoginSignup from './Components/LoginSignup/LoginSignup';
 import ExplorePodcasts from './Components/Explore/ExplorePodcasts';
+// new added ->
+import React from 'react';
+import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+// end of new added ->
+
 
 function App() {
 
@@ -11,10 +16,19 @@ function App() {
 //   };
 
   return (
-    <div>
-      <LoginSignup />
-      <ExplorePodcasts />
-    </div>
+    <Router>
+      <Routes>
+        <Route exat path="/" element={<LoginSignup />} />
+        <Route path="/explore-podcasts" element={<ExplorePodcasts />} />
+      </Routes>
+    </Router>
+
+    // old code ->
+    // <div>
+    //   <LoginSignup />
+    //   <ExplorePodcasts />
+    // </div>
+    // end of old code ->
   );
 }
 
