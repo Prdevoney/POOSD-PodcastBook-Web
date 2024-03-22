@@ -6,7 +6,6 @@ const MongoClient = require("mongodb").MongoClient;
 const client = new MongoClient(url);
 client.connect(console.log("mongodb connected"));
 
-
 // API for registering a new user
 router.post('/register', async (req, res) => {
     try {
