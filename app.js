@@ -1,5 +1,6 @@
 var createError = require('http-errors');
 var express = require('express');
+require('dotenv').config();
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -18,7 +19,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 // Define routes
-app.use('/api/test/', indexRouter);
+app.use('/api', indexRouter);
 app.use('/podcast', podcastRouter);
 
 // The "catchall" handler: for any request that doesn't

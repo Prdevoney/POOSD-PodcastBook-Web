@@ -23,7 +23,7 @@ const LoginSignup = () => {
         console.log(user);
 
         // Send signup data to backend
-        const response = await fetch('/api/test/register', {
+        const response = await fetch('/api/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
@@ -57,7 +57,7 @@ const LoginSignup = () => {
     const handleLogin = async () => {
       try {
         // Send login data to backend
-        const response = await fetch('/api/test/login', {
+        const response = await fetch('/api/login', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
