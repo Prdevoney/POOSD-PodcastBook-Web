@@ -84,7 +84,7 @@ router.post('/register', validateUser, validate, async (req, res) => {
 
         })
         // Respond with success message
-        res.status(201).json({ message: "User registered successfully", userId: result.insertedId });
+        res.status(201).json({ message: "User registered successfully", UserID: result.insertedId });
     } catch (error) {
         console.error("Error registering user:", error);
         res.status(500).json({ error: "An error occurred while registering user" });
@@ -124,12 +124,12 @@ router.post('/login', async (req, res) => {
         }
 
         //create json web token
-        const token = jwt.sign({userId: user._id}, process.env.JWT_SECRET, {
+        const token = jwt.sign({UserID: user._id}, process.env.JWT_SECRET, {
             expiresIn: '1d'
         });
 
         // If username and password match, respond with success message
-        res.status(200).json({ message: "Login successful", userId: user._id, token});
+        res.status(200).json({ message: "Login successful", UserID: user._id, token});
     } catch (error) {
         console.error("Error logging in:", error);
         res.status(500).json({ error: "An error occurred while logging in" });
@@ -138,21 +138,21 @@ router.post('/login', async (req, res) => {
 
 router.post('/verifyEmail', async (req, res) => {
     try {
-        const { userId, otp } = req.body;
+        const { UserID, otp } = req.body;
 
-        if (!userId || !otp) {
+        if (!UserID || !otp) {
             return res.status(400).json({ error: "Invalid request, missing parameters"});
         }
 
-        if (!ObjectId.isValid(userId)) {
-            return res.status(400).json({ error: "Invalid userId" });
+        if (!ObjectId.isValid(UserID)) {
+            return res.status(400).json({ error: "Invalid UserID" });
         }
         
         await client.connect();
         const db = client.db("Podcast");
         const collection = db.collection('User');
         
-        const user = await collection.findOne({_id: ObjectId.createFromHexString(userId)});
+        const user = await collection.findOne({_id: ObjectId.createFromHexString(UserID)});
 
         if (!user) {
             return res.status(400).json({ error: "User not found" });
@@ -262,6 +262,161 @@ router.delete('/deleteUser', async (req, res) => {
     console.error("Error deleting user:", error);
     res.status(500).json({ error: "An error occurred while deleting user" });
   }
+});
+
+
+// Endpoint for toggling follow/unfollow status between a user and a target user.
+router.post('/followUnfollowToggle', async (req, res) => {
+    try {
+        // Extract UserID and targetUserID from the request body
+        const { UserID, targetUserID } = req.body;
+
+        // Connect to the MongoDB client
+        await client.connect();
+
+        // Get reference to the MongoDB database and the 'User' collection
+        const db = client.db("Podcast");
+        const collection = db.collection('User');
+
+        // Find the user by UserID
+        const user = await collection.findOne({ _id: new ObjectId(UserID) });
+
+        // Return an error response if user not found
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Find the target user by targetUserID
+        const targetUser = await collection.findOne({ _id: new ObjectId(targetUserID) });
+
+        // Return an error response if target user not found
+        if (!targetUser) {
+            return res.status(404).json({ error: "Target user not found" });
+        }
+
+        // Check if the user is already following the target user
+        const isFollowing = user.Following.includes(targetUserID);
+
+        // If user is already following the target user, unfollow
+        if (isFollowing) {
+            // Remove the target user from the user's Following array
+            await collection.updateOne(
+                { _id: new ObjectId(UserID) },
+                { $pull: { Following: targetUserID } }
+            );
+
+            // Remove the user from the target user's Followers array
+            await collection.updateOne(
+                { _id: new ObjectId(targetUserID) },
+                { $pull: { Followers: UserID } }
+            );
+
+            // Respond with success message and updated following status
+            res.status(200).json({ message: "User unfollowed successfully", following: false });
+        } else {
+            // If user is not following the target user, follow
+            // Add the target user to the user's Following array
+            await collection.updateOne(
+                { _id: new ObjectId(UserID) },
+                { $addToSet: { Following: targetUserID } }
+            );
+
+            // Add the user to the target user's Followers array
+            await collection.updateOne(
+                { _id: new ObjectId(targetUserID) },
+                { $addToSet: { Followers: UserID } }
+            );
+
+            // Respond with success message and updated following status
+            res.status(200).json({ message: "User followed successfully", following: true });
+        }
+    } catch (error) {
+        // Handle any errors that occur during the process
+        console.error("Error toggling follow/unfollow:", error);
+        res.status(500).json({ error: "An error occurred while toggling follow/unfollow" });
+    }
+});
+
+// Endpoint for retrieving a users followers with pagination
+router.post('/getFollowers', async (req, res) => {
+    try {
+        const { UserID, page = 1, limit = 10 } = req.body; // Default to page 1 and limit 10 if not provided
+
+        // Ensure that limit is parsed as an integer
+        const parsedLimit = parseInt(limit, 10);
+
+        if (isNaN(parsedLimit) || parsedLimit <= 0) {
+            return res.status(400).json({ error: "Limit must be a positive integer" });
+        }
+
+        await client.connect();
+
+        const db = client.db("Podcast");
+        const collection = db.collection('User');
+
+        // Find the user by UserID
+        const user = await collection.findOne({ _id: new ObjectId(UserID) });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Calculate skip value for pagination
+        const skip = (page - 1) * parsedLimit;
+
+        // Retrieve followers' information with pagination
+        const followerIds = user.Followers.map(id => new ObjectId(id));
+        const followersInfo = await collection.find({ _id: { $in: followerIds } })
+                                              .skip(skip)
+                                              .limit(parsedLimit)
+                                              .toArray();
+
+        res.status(200).json({ followers: followersInfo, page, limit: parsedLimit });
+    } catch (error) {
+        console.error("Error fetching followers:", error);
+        res.status(500).json({ error: "An error occurred while fetching followers" });
+    }
+});
+
+// Endpoint for retrieving users whom the specified user is following with pagination
+router.post('/getFollowing', async (req, res) => {
+    try {
+        const { UserID, page = 1, limit = 10 } = req.body; // Default to page 1 and limit 10 if not provided
+
+        // Ensure that limit is parsed as an integer
+        const parsedLimit = parseInt(limit, 10);
+
+        if (isNaN(parsedLimit) || parsedLimit <= 0) {
+            return res.status(400).json({ error: "Limit must be a positive integer" });
+        }
+
+        await client.connect();
+
+        const db = client.db("Podcast");
+        const collection = db.collection('User');
+
+        // Find the user by UserID
+        const user = await collection.findOne({ _id: new ObjectId(UserID) });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Calculate skip value for pagination
+        const skip = (page - 1) * parsedLimit;
+
+        // Retrieve following users' information with pagination
+        const followingIds = user.Following.map(id => new ObjectId(id));
+        const followingInfo = await collection.find({ _id: { $in: followingIds } })
+                                              .skip(skip)
+                                              .limit(parsedLimit)
+                                              .toArray();
+
+        res.status(200).json({ following: followingInfo, page, limit: parsedLimit });
+    } catch (error) {
+        console.error("Error fetching following:", error);
+        res.status(500).json({ error: "An error occurred while fetching following" });
+    }
 });
 
 module.exports = router;
