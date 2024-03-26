@@ -6,6 +6,8 @@ const MongoClient = require("mongodb").MongoClient;
 const client = new MongoClient(url);
 client.connect(console.log("mongodb connected"));
 
+const { ObjectId } = require('mongodb');
+
 router.post('/writeReview', async (req, res) => {
   try {
     const { Podcast, Rating, Comment, Username, UserID } = req.body;
@@ -28,17 +30,13 @@ router.post('/writeReview', async (req, res) => {
     const db = client.db("Podcast");
     const collection = db.collection('Review');
 
-    // Generate reviewId
-    const reviewId = new ObjectId();
-
     // Create review object
     const newReview = {
-      reviewId,
       Podcast,
       Rating: rating,
       Comment,
       Username,
-      UserID: ObjectId(UserID),
+      UserID: new ObjectId(UserID),
       LikeCount: 0,
       LikedBy: []
     };
@@ -47,7 +45,7 @@ router.post('/writeReview', async (req, res) => {
     const result = await collection.insertOne(newReview);
 
     // Respond with success message
-    res.status(201).json({ message: "Review added successfully", reviewId });
+    res.status(201).json({ message: "Review added successfully", reviewId: result.insertedId });
   } catch (error) {
     console.error("Error writing review:", error);
     res.status(500).json({ error: "An error occurred while writing review" });
@@ -70,7 +68,7 @@ router.post('/getReview', async (req, res) => {
     const collection = db.collection('Review');
 
     // Search for the review by review ID
-    const query = { _id: ObjectId(reviewId) };
+    const query = { _id: new ObjectId(reviewId) };
     const review = await collection.findOne(query);
 
     if (!review) {
@@ -111,7 +109,7 @@ router.put('/editReview', async (req, res) => {
     const db = client.db("Podcast");
     const collection = db.collection('Review');
 
-    const reviewToUpdate = await collection.findOne({ _id: ObjectId(reviewId) });
+    const reviewToUpdate = await collection.findOne({ _id: new ObjectId(reviewId) });
 
     if (!reviewToUpdate) {
       return res.status(404).json({ error: "Review not found" });
@@ -127,7 +125,7 @@ router.put('/editReview', async (req, res) => {
       updatedFields.Comment = Comment;
     }
 
-    const result = await collection.updateOne({ _id: ObjectId(reviewId) }, { $set: updatedFields });
+    const result = await collection.updateOne({ _id: new ObjectId(reviewId) }, { $set: updatedFields });
 
     if (result.modifiedCount === 1) {
       return res.status(200).json({ message: "Review updated successfully" });
@@ -153,7 +151,7 @@ router.delete('/deleteReview', async (req, res) => {
     const db = client.db("Podcast");
     const collection = db.collection('Review');
 
-    const result = await collection.deleteOne({ _id: ObjectId(reviewId) });
+    const result = await collection.deleteOne({ _id: new ObjectId(reviewId) });
 
     if (result.deletedCount === 1) {
       return res.status(200).json({ message: "Review deleted successfully" });
@@ -209,7 +207,7 @@ router.post('/userReviews', async (req, res) => {
     const db = client.db("Podcast");
     const collection = db.collection('Review');
 
-    const query = { UserID: ObjectId(UserID) };
+    const query = { UserID: new ObjectId(UserID) };
     const userReviews = await collection.find(query).toArray();
 
     if (userReviews.length === 0) {
@@ -273,21 +271,24 @@ router.post('/likeToggle', async (req, res) => {
     const collection = db.collection('Review');
 
     // Find the review by reviewId
-    const query = { reviewId: ObjectId(reviewId) };
-    const review = await collection.findOne(query);
+    const review = await collection.findOne({ _id: new ObjectId(reviewId) });
 
     if (!review) {
       return res.status(404).json({ error: "Review not found" });
     }
 
     // Check if userId is already in LikedBy array
-    const likedIndex = review.LikedBy.indexOf(ObjectId(UserID));
-    if (likedIndex === -1) {
+    const userExistsInLikedBy = await collection.findOne({
+      _id: new ObjectId(reviewId),
+      LikedBy: new ObjectId(UserID)
+    });
+
+    if (!userExistsInLikedBy) {
       // If userId is not in LikedBy array, increment LikeCount by 1 and add userId to LikedBy array
-      await collection.updateOne({ _id: ObjectId(reviewId) }, { $inc: { LikeCount: 1 }, $push: { LikedBy: ObjectId(UserID) } });
+      await collection.updateOne({ _id: new ObjectId(reviewId) }, { $inc: { LikeCount: 1 }, $push: { LikedBy: new ObjectId(UserID) } });
     } else {
       // If userId is already in LikedBy array, decrement LikeCount by 1 and remove userId from LikedBy array
-      await collection.updateOne({ _id: ObjectId(reviewId) }, { $inc: { LikeCount: -1 }, $pull: { LikedBy: ObjectId(UserID) } });
+      await collection.updateOne({ _id: new ObjectId(reviewId) }, { $inc: { LikeCount: -1 }, $pull: { LikedBy: new ObjectId(UserID) } });
     }
 
     // Respond with success message
