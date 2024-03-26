@@ -214,7 +214,7 @@ router.put('/updatePassword', async (req, res) => {
       const collection = db.collection('User');
   
       // Check if the user exists
-      const user = await collection.findOne({ _id: ObjectId(id) });
+      const user = await collection.findOne({ _id: new ObjectId(id) });
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
@@ -223,7 +223,7 @@ router.put('/updatePassword', async (req, res) => {
       const hashPassword = await bcrypt.hash(Password, 8);
   
       // Update password
-      await collection.updateOne({ _id: ObjectId(id) }, { $set: { Password: hashPassword } });
+      await collection.updateOne({ _id: new ObjectId(id) }, { $set: { Password: hashPassword } });
   
       // Respond with success message
       res.status(200).json({ message: "User password updated successfully" });
@@ -248,13 +248,13 @@ router.delete('/deleteUser', async (req, res) => {
     const collection = db.collection('User');
 
     // Check if the user exists
-    const user = await collection.findOne({ _id: ObjectId(id) });
+    const user = await collection.findOne({ _id: new ObjectId(id) });
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
     // Delete the user
-    await collection.deleteOne({ _id: ObjectId(id) });
+    await collection.deleteOne({ _id: new ObjectId(id) });
 
     // Respond with success message
     res.status(200).json({ message: "User deleted successfully" });
