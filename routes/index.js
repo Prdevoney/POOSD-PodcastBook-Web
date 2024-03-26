@@ -30,6 +30,14 @@ router.post('/register', validateUser, validate, async (req, res) => {
             return res.status(400).json({ error: "Username already exists" });
         }
 
+        // Checking for password requirements
+        const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
+        if (!passwordRegex.test(Password)) {
+            return res.status(400).json({
+                error: "Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one number."
+            });
+        }
+
         // Create user object
         const newUser = {
             Email,
@@ -183,5 +191,77 @@ router.post('/verifyEmail', async (req, res) => {
     }
 });
 
+router.put('/updatePassword', async (req, res) => {
+    try {
+      const { id, Password } = req.body;
+  
+      // Check if _id and password are provided
+      if (!id || !Password) {
+        return res.status(400).json({ error: "_id and Password parameters are required" });
+      }
+  
+      // Check password requirements
+      const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
+      if (!passwordRegex.test(Password)) {
+        return res.status(400).json({
+          error: "Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one number."
+        });
+      }
+  
+      await client.connect();
+  
+      const db = client.db("Podcast");
+      const collection = db.collection('User');
+  
+      // Check if the user exists
+      const user = await collection.findOne({ _id: ObjectId(id) });
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+  
+      // Hash the new password
+      const hashPassword = await bcrypt.hash(Password, 8);
+  
+      // Update password
+      await collection.updateOne({ _id: ObjectId(id) }, { $set: { Password: hashPassword } });
+  
+      // Respond with success message
+      res.status(200).json({ message: "User password updated successfully" });
+    } catch (error) {
+      console.error("Error updating user:", error);
+      res.status(500).json({ error: "An error occurred while updating user" });
+    }
+  });
+  
+router.delete('/deleteUser', async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    // Check if _id is provided
+    if (!id) {
+      return res.status(400).json({ error: "_id parameter is required" });
+    }
+
+    await client.connect();
+
+    const db = client.db("Podcast");
+    const collection = db.collection('User');
+
+    // Check if the user exists
+    const user = await collection.findOne({ _id: ObjectId(id) });
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Delete the user
+    await collection.deleteOne({ _id: ObjectId(id) });
+
+    // Respond with success message
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ error: "An error occurred while deleting user" });
+  }
+});
 
 module.exports = router;
