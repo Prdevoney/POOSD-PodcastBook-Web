@@ -25,7 +25,7 @@ router.post('/register', validateUser, validate, async (req, res) => {
 
         // Check if the username already exists
         const existingUser = await collection.findOne({ Username: { $regex: new RegExp('^' + Username + '$', 'i') } });
-        
+
         if (existingUser) {
             return res.status(400).json({ error: "Username already exists" });
         }
@@ -61,8 +61,8 @@ router.post('/register', validateUser, validate, async (req, res) => {
         const VerificationToken = {
             owner: newUser._id,
             token: OTP,
-            createdAt : new Date(),
-            expiresAt : new Date(Date.now() + 3600000),
+            createdAt: new Date(),
+            expiresAt: new Date(Date.now() + 3600000),
         };
 
         //hash token before saving into database
@@ -73,7 +73,7 @@ router.post('/register', validateUser, validate, async (req, res) => {
         const verificationToken = await db.collection('VerificationTokens').insertOne(VerificationToken);
         //delete verification token from database after 1 hr
         setTimeout(async () => {
-            await db.collection('VerificationTokens').deleteOne({_id: VerificationToken.owner});
+            await db.collection('VerificationTokens').deleteOne({ _id: VerificationToken.owner });
         }, 3600000);
 
         mailTransport().sendMail({
@@ -95,7 +95,7 @@ router.post('/register', validateUser, validate, async (req, res) => {
 // API for logging in a user
 router.post('/login', async (req, res) => {
     try {
-      console.log("login");
+        console.log("login");
         // Extract username and password from request body
         const { Username, Password } = req.body;
 
@@ -124,12 +124,12 @@ router.post('/login', async (req, res) => {
         }
 
         //create json web token
-        const token = jwt.sign({UserID: user._id}, process.env.JWT_SECRET, {
+        const token = jwt.sign({ UserID: user._id }, process.env.JWT_SECRET, {
             expiresIn: '1d'
         });
 
         // If username and password match, respond with success message
-        res.status(200).json({ message: "Login successful", UserID: user._id, token});
+        res.status(200).json({ message: "Login successful", UserID: user._id, token });
     } catch (error) {
         console.error("Error logging in:", error);
         res.status(500).json({ error: "An error occurred while logging in" });
@@ -141,18 +141,18 @@ router.post('/verifyEmail', async (req, res) => {
         const { UserID, otp } = req.body;
 
         if (!UserID || !otp) {
-            return res.status(400).json({ error: "Invalid request, missing parameters"});
+            return res.status(400).json({ error: "Invalid request, missing parameters" });
         }
 
         if (!ObjectId.isValid(UserID)) {
             return res.status(400).json({ error: "Invalid UserID" });
         }
-        
+
         await client.connect();
         const db = client.db("Podcast");
         const collection = db.collection('User');
-        
-        const user = await collection.findOne({_id: ObjectId.createFromHexString(UserID)});
+
+        const user = await collection.findOne({ _id: ObjectId.createFromHexString(UserID) });
 
         if (!user) {
             return res.status(400).json({ error: "User not found" });
@@ -160,8 +160,8 @@ router.post('/verifyEmail', async (req, res) => {
         if (user.verified) {
             return res.status(400).json({ error: "This account is already verified" });
         }
-       
-        const token = await db.collection('VerificationTokens').findOne({owner: user._id});
+
+        const token = await db.collection('VerificationTokens').findOne({ owner: user._id });
         if (!token) {
             return res.status(400).json({ error: "User not found" });
         }
@@ -172,9 +172,9 @@ router.post('/verifyEmail', async (req, res) => {
         }
 
 
-       
-        await collection.findOneAndUpdate({_id: user._id},{$set: {verified: true}});
-        await db.collection('VerificationTokens').findOneAndDelete({owner: user._id});
+
+        await collection.findOneAndUpdate({ _id: user._id }, { $set: { verified: true } });
+        await db.collection('VerificationTokens').findOneAndDelete({ owner: user._id });
 
         mailTransport().sendMail({
             from: 'emailverification@email.com',
@@ -184,7 +184,7 @@ router.post('/verifyEmail', async (req, res) => {
         })
 
         // Respond with success message
-        res.status(201).json({ message: "User verified successfully"});
+        res.status(201).json({ message: "User verified successfully" });
     } catch (error) {
         console.error("Error registering user:", error);
         res.status(500).json({ error: "An error occurred while verifying user" });
@@ -193,75 +193,84 @@ router.post('/verifyEmail', async (req, res) => {
 
 router.put('/updatePassword', async (req, res) => {
     try {
-      const { id, Password } = req.body;
-  
-      // Check if _id and password are provided
-      if (!id || !Password) {
-        return res.status(400).json({ error: "_id and Password parameters are required" });
-      }
-  
-      // Check password requirements
-      const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
-      if (!passwordRegex.test(Password)) {
-        return res.status(400).json({
-          error: "Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one number."
-        });
-      }
-  
-      await client.connect();
-  
-      const db = client.db("Podcast");
-      const collection = db.collection('User');
-  
-      // Check if the user exists
-      const user = await collection.findOne({ _id: new ObjectId(id) });
-      if (!user) {
-        return res.status(404).json({ error: "User not found" });
-      }
-  
-      // Hash the new password
-      const hashPassword = await bcrypt.hash(Password, 8);
-  
-      // Update password
-      await collection.updateOne({ _id: new ObjectId(id) }, { $set: { Password: hashPassword } });
-  
-      // Respond with success message
-      res.status(200).json({ message: "User password updated successfully" });
+        const { id, Password } = req.body;
+
+        // Check if _id and password are provided
+        if (!id || !Password) {
+            return res.status(400).json({ error: "_id and Password parameters are required" });
+        }
+
+        // Check password requirements
+        const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/;
+        if (!passwordRegex.test(Password)) {
+            return res.status(400).json({
+                error: "Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase letter, and one number."
+            });
+        }
+
+        await client.connect();
+
+        const db = client.db("Podcast");
+        const collection = db.collection('User');
+
+        // Check if the user exists
+        const user = await collection.findOne({ _id: new ObjectId(id) });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Hash the new password
+        const hashPassword = await bcrypt.hash(Password, 8);
+
+        // Update password
+        await collection.updateOne({ _id: new ObjectId(id) }, { $set: { Password: hashPassword } });
+
+        // Respond with success message
+        res.status(200).json({ message: "User password updated successfully" });
     } catch (error) {
-      console.error("Error updating user:", error);
-      res.status(500).json({ error: "An error occurred while updating user" });
+        console.error("Error updating user:", error);
+        res.status(500).json({ error: "An error occurred while updating user" });
     }
-  });
-  
+});
+
 router.delete('/deleteUser', async (req, res) => {
-  try {
-    const { id } = req.body;
+    try {
+        const { id } = req.body;
 
-    // Check if _id is provided
-    if (!id) {
-      return res.status(400).json({ error: "_id parameter is required" });
+        // Check if _id is provided
+        if (!id) {
+            return res.status(400).json({ error: "_id parameter is required" });
+        }
+
+        await client.connect();
+
+        const db = client.db("Podcast");
+        const collection = db.collection('User');
+
+        // Check if the user exists
+        const user = await collection.findOne({ _id: new ObjectId(id) });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // Delete the user
+        await collection.deleteOne({ _id: new ObjectId(id) });
+
+        // Respond with success message
+        res.status(200).json({ message: "User deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        res.status(500).json({ error: "An error occurred while deleting user" });
     }
+});
 
-    await client.connect();
-
-    const db = client.db("Podcast");
-    const collection = db.collection('User');
-
-    // Check if the user exists
-    const user = await collection.findOne({ _id: new ObjectId(id) });
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
+router.post('/FollowUser', async (req, res) => {
+    try {
+        
+    } catch (error) {
+        console.error("Follow User Error", error);
+        res.status(500).json({ error: "An error occurred while Following a user" });
     }
-
-    // Delete the user
-    await collection.deleteOne({ _id: new ObjectId(id) });
-
-    // Respond with success message
-    res.status(200).json({ message: "User deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting user:", error);
-    res.status(500).json({ error: "An error occurred while deleting user" });
-  }
 });
 
 
@@ -367,9 +376,9 @@ router.post('/getFollowers', async (req, res) => {
         // Retrieve followers' information with pagination
         const followerIds = user.Followers.map(id => new ObjectId(id));
         const followersInfo = await collection.find({ _id: { $in: followerIds } })
-                                              .skip(skip)
-                                              .limit(parsedLimit)
-                                              .toArray();
+            .skip(skip)
+            .limit(parsedLimit)
+            .toArray();
 
         res.status(200).json({ followers: followersInfo, page, limit: parsedLimit });
     } catch (error) {
@@ -408,14 +417,40 @@ router.post('/getFollowing', async (req, res) => {
         // Retrieve following users' information with pagination
         const followingIds = user.Following.map(id => new ObjectId(id));
         const followingInfo = await collection.find({ _id: { $in: followingIds } })
-                                              .skip(skip)
-                                              .limit(parsedLimit)
-                                              .toArray();
+            .skip(skip)
+            .limit(parsedLimit)
+            .toArray();
 
         res.status(200).json({ following: followingInfo, page, limit: parsedLimit });
     } catch (error) {
         console.error("Error fetching following:", error);
         res.status(500).json({ error: "An error occurred while fetching following" });
+    }
+});
+
+router.post('/SearchUser', async (req, res) => {
+    try {
+        // Extract username and password from request body
+        const {Username} = req.body;
+        console.log("Searching for user", Username);
+        await client.connect();
+
+        const db = client.db("Podcast");
+        const collection = db.collection('User');
+
+        const users = await collection.find({ Username: {$regex: new RegExp(Username, 'i')} }).toArray();
+
+        // const results = await db.collection('Cards').find({"Card":{$regex:_search+'.*', $options:'r'}}).toArray();
+
+        if (!users) {
+            return res.status(404).json({ error: "User not found" });
+        } else {
+            return res.status(200).json(users);
+        }
+
+    } catch (error) {
+        console.error("Error fetching following:", error);
+        res.status(500).json({ error: "An error occurred could not find user should not reach here hopefully" });
     }
 });
 
