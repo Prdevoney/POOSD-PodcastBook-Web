@@ -264,15 +264,6 @@ router.delete('/deleteUser', async (req, res) => {
     }
 });
 
-router.post('/FollowUser', async (req, res) => {
-    try {
-        
-    } catch (error) {
-        console.error("Follow User Error", error);
-        res.status(500).json({ error: "An error occurred while Following a user" });
-    }
-});
-
 
 // Endpoint for toggling follow/unfollow status between a user and a target user.
 router.post('/followUnfollowToggle', async (req, res) => {
@@ -427,6 +418,42 @@ router.post('/getFollowing', async (req, res) => {
         res.status(500).json({ error: "An error occurred while fetching following" });
     }
 });
+
+router.post('/FollowUser', async (req, res) => {
+    try {
+      const { UserID, targetUserID } = req.body;
+  
+      // Check for required fields
+      if ( !UserID || !targetUserID) {
+        return res.status(400).json({ error: "All fields are required" });
+      }
+  
+      
+      await client.connect();
+  
+      const db = client.db("Podcast");
+      const collection = db.collection('User');
+
+
+      const user = await collection.findOne({ _id: new ObjectId(UserID) });
+
+      const targetuser = await collection.findOne({ _id: new ObjectId(targetUserID) });
+
+      console.log("Searching for user", user);
+
+      console.log("Searching for target user", targetuser);
+
+      collection.updateOne({_id: new ObjectId(UserID)}, { $push: { Following: new ObjectId(targetUserID)}});
+
+      collection.updateOne({_id: new ObjectId(targetUserID)}, { $push: { Following: new ObjectId(UserID)}});
+
+      // Respond with success message
+      res.status(201).json({ message: "Follow added successfully", user });
+    } catch (error) {
+      console.error("Error Following user:", error);
+      res.status(500).json({ error: "An error occurred while Following user" });
+    }
+  });
 
 router.post('/SearchUser', async (req, res) => {
     try {
