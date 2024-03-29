@@ -345,13 +345,50 @@ router.post('/likeToggle', async (req, res) => {
   }
 });
 
-// Some sample function definitions for using the Listen Notes API to get Podcast data
-router.post('/search', function(req, res, next) {
-  res.send('This may return a Podcast name, description, photo, Podcast ID, etc.');
-});
+// Endpoint to get chronological feed of reviews using pagination, based on a users Following array
+router.post('/feed', async (req, res) => {
+  try {
+      // Extract UserID, page, and limit from request body, defaults to page = 1 and limit = 10 if they are not given
+      const { UserID, page = 1, limit = 10 } = req.body;
 
-router.post('/recommendations', function(req, res, next) {
-  res.send('Maybe we can have a feature to recommend Podcasts based on the Podcasts that the user has positive reviews on.');
+      // Check if UserID is provided
+      if (!UserID) {
+          return res.status(400).json({ error: "UserID is required" });
+      }
+
+      // Parse page and limit as integers
+      const parsedPage = parseInt(page);
+      const parsedLimit = parseInt(limit);
+
+      // Check if page and limit are valid integers
+      if (isNaN(parsedPage) || isNaN(parsedLimit)) {
+          return res.status(400).json({ error: "page and limit must be integers" });
+      }
+
+      // Find the user based on UserID
+      const user = await client.db("Podcast").collection('User').findOne({ _id: new ObjectId(UserID) });
+
+      // If user not found, return error
+      if (!user) {
+          return res.status(404).json({ error: "User not found" });
+      }
+
+      // Extract IDs of users that the current user is following
+      const followingIds = user.Following.map(id => new ObjectId(id));
+
+      // Fetch reviews written by users in the following list
+      const reviews = await client.db("Podcast").collection('Review')
+          .find({ UserID: { $in: followingIds } }) // Query to find reviews by following users
+          .sort({ createdAt: -1 }) // Sort reviews by createdAt in descending order (chronological)
+          .skip((parsedPage - 1) * parsedLimit) // Skip reviews for pagination
+          .limit(parsedLimit) // Limit number of reviews per page
+          .toArray(); // Convert reviews to array
+
+      res.status(200).json(reviews);
+  } catch (error) {
+      console.error("Error fetching feed:", error);
+      res.status(500).json({ error: "An error occurred while fetching feed" });
+  }
 });
 
 module.exports = router;
