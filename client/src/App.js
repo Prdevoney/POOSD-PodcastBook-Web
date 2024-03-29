@@ -3,6 +3,7 @@ import LoginSignup from './Components/LoginSignup/LoginSignup';
 import ExplorePodcasts from './Components/Explore/ExplorePodcasts';
 // new added ->
 import React from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
 // end of new added ->
 
