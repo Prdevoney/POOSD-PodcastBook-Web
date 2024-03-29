@@ -445,10 +445,46 @@ router.post('/FollowUser', async (req, res) => {
 
       collection.updateOne({_id: new ObjectId(UserID)}, { $push: { Following: new ObjectId(targetUserID)}});
 
-      collection.updateOne({_id: new ObjectId(targetUserID)}, { $push: { Following: new ObjectId(UserID)}});
+      collection.updateOne({_id: new ObjectId(targetUserID)}, { $push: { Followers: new ObjectId(UserID)}});
 
       // Respond with success message
       res.status(201).json({ message: "Follow added successfully", user });
+    } catch (error) {
+      console.error("Error Following user:", error);
+      res.status(500).json({ error: "An error occurred while Following user" });
+    }
+  });
+
+  router.post('/UnFollowUser', async (req, res) => {
+    try {
+      const { UserID, targetUserID } = req.body;
+  
+      // Check for required fields
+      if ( !UserID || !targetUserID) {
+        return res.status(400).json({ error: "All fields are required" });
+      }
+  
+      
+      await client.connect();
+  
+      const db = client.db("Podcast");
+      const collection = db.collection('User');
+
+
+      const user = await collection.findOne({ _id: new ObjectId(UserID) });
+
+      const targetuser = await collection.findOne({ _id: new ObjectId(targetUserID) });
+
+      console.log("Searching for user", user);
+
+      console.log("Searching for target user", targetuser);
+
+      collection.updateOne({_id: new ObjectId(UserID)}, { $pull: { Following: new ObjectId(targetUserID)}});
+
+      collection.updateOne({_id: new ObjectId(targetUserID)}, { $pull: { Followers: new ObjectId(UserID)}});
+
+      // Respond with success message
+      res.status(201).json({ message: "Unfollow successfully", user });
     } catch (error) {
       console.error("Error Following user:", error);
       res.status(500).json({ error: "An error occurred while Following user" });
