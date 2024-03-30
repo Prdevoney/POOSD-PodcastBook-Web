@@ -68,11 +68,14 @@ const LoginSignup = () => {
             "Password": password
           })
         });
-  
+    
         const data = await response.json();
         if (response.ok) {
           console.log(data); // Handle response from the server as needed
           
+          // Store username in sessionStorage
+          sessionStorage.setItem('username', username);
+    
           // Redirect to Explore Podcasts page upon successful login
           window.location.href = '/explore-podcasts';
         } else {
@@ -84,7 +87,6 @@ const LoginSignup = () => {
         alert("Login failed: " + error.message);
       }
     };
-
     // end of new info
 
 function handleSignUpClick(event) {
