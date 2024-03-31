@@ -12,6 +12,25 @@ console.log('Username:', username); Output the retrieved username*/
 
 
 const ExplorePodcasts = () => {
+  const [podcasts, setPodcasts] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/feed', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ UserID: 'username' }), 
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setPodcasts(data); // Assuming the API response is an array of podcasts
+      })
+      .catch((error) => {
+        console.error('Error fetching feed:', error);
+      });
+  }, []);
+  
   return (
     <Navbar expand="lg" bg="light" variant="light">
       <Container>
