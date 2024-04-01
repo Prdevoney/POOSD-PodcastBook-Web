@@ -1,6 +1,6 @@
 import './App.css';
-import LoginSignup from './components/LoginSignup/LoginSignup.jsx';
-import ExplorePodcasts from './components/Explore/ExplorePodcasts.jsx';
+import LoginSignup from './Components/LoginSignup/LoginSignup.jsx';
+import ExplorePodcasts from './Components/Explore/ExplorePodcasts.jsx';
 // new added ->
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
