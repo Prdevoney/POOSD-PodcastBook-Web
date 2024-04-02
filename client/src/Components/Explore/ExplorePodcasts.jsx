@@ -1,75 +1,133 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
-import Dropdown from 'react-bootstrap/Dropdown';
+import Button from 'react-bootstrap/Button';
+import Form from 'react-bootstrap/Form';
+import './ExplorePage.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
-/*getting username from login:
 const username = sessionStorage.getItem('username');
-console.log('Username:', username); Output the retrieved username*/
+console.log('Username:', username); // Output the retrieved username
 
+const ReviewBox = ({ podcast, reviewText, rating }) => {
+    return (
+      <div className="review-box bg-light p-3 mb-3">
+        <h5 className="card-title">Podcast: {podcast}</h5>
+        <p className="card-text">{reviewText.length > 100 ? reviewText.substring(0, 100) + '...' : reviewText}</p>
+        <p className="card-text">Rating: {rating}</p>
+      </div>
+    );
+  };
 
-const ExplorePodcasts = () => {
-  const [podcasts, setPodcasts] = useState([]);
+const ExplorePodcasts =() =>{
+  const [reviews, setReviews] = useState([]);
+  const [error, setError] = useState(null);
+  const [searchType, setSearchType] = useState('Podcast');
+  const [searchInput, setSearchInput] = useState('');
+  const handleSearch = async () => {
+    try {
+        const response = await fetch('http://localhost:3000/api/getReview', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                UserID: sessionStorage.getItem('username'),
+                SearchType: searchType,
+                SearchInput: searchInput
+            })
+        });
 
+        if (response.ok) {
+            const data = await response.json();
+            setReviews(data);
+            setError(null);
+        } else {
+            setError('Error fetching reviews');
+            setReviews([]);
+        }
+    } catch (error) {
+        console.error('Error searching reviews:', error);
+        setError('Error searching reviews');
+        setReviews([]);
+    }
+};
   useEffect(() => {
-    fetch('/api/feed', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ UserID: 'username' }), 
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        setPodcasts(data); // Assuming the API response is an array of podcasts
-      })
-      .catch((error) => {
-        console.error('Error fetching feed:', error);
-      });
+    const fetchReviews = async () => {
+        try {
+            const response = await fetch('http://localhost:3000/api/feed', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    UserID: sessionStorage.getItem('username')
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setReviews(data);
+            } else {
+                setError('Error fetching reviews');
+            }
+        } catch (error) {
+            console.error('Error fetching reviews:', error);
+            setError('Error fetching reviews');
+        }
+    };
+
+    fetchReviews();
   }, []);
   
+  
+
   return (
-    <Navbar expand="lg" bg="light" variant="light">
-      <Container>
-        <Navbar.Brand href="#home">React-Bootstrap</Navbar.Brand>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" />
-        <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto">
-            <Nav.Link href="#home">Home</Nav.Link>
-            <Nav.Link href="#link">Link</Nav.Link>
-            <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-              <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.2">Another action</NavDropdown.Item>
-              <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item href="#action/3.4">Separated link</NavDropdown.Item>
-            </NavDropdown>
+  <Navbar expand="sm" className="navbar-container" /*bg="primary" data-bs-theme="dark"*/  >
+      <Container fluid >
+        <Navbar.Brand href="#">Podcast Book</Navbar.Brand>
+        <Navbar.Toggle aria-controls="navbarScroll" style={{ height: '50px' }}/>
+        <Navbar.Collapse id="navbarScroll" >
+          <Nav className="me-auto my-2 my-lg-0" style={{ maxHeight: '100px' }} navbarScroll>
+            <Nav.Link href="#action1">Explore</Nav.Link>
+            <Nav.Link href="#action2">Account</Nav.Link>
           </Nav>
-          <div className="d-flex align-items-center">
-            <Dropdown>
-              <Dropdown.Toggle variant="light" id="dropdown-basic">
-                Select Type
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <Dropdown.Item href="#/podcast">Podcast Title</Dropdown.Item>
-                <Dropdown.Item href="#/episode">Episode Title</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-            <form className="d-flex mx-3">
-              <input
-                className="form-control me-2"
-                type="search"
-                placeholder="Search"
-                aria-label="Search"
-              />
-              <button className="btn btn-outline-success" type="submit">
-                Search
-              </button>
-            </form>
-          </div>
+          <Form.Select 
+            className = "me-3" 
+            style={{width: '110px'}} 
+            aria-label="Default select example"
+            onChange={(e) => setSearchType(e.target.value)}>
+            <option value="1">Podcast</option>
+            <option value="2">Episode</option>
+          </Form.Select>
+          <Form className="d-flex">
+            <Form.Control
+              type="search"
+              placeholder="Search"
+              className="me-2"
+              aria-label="Search"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+            />
+            <Button variant="outline-light" onClick={handleSearch}>Search</Button>
+          </Form>
+          <div className="review-container">
+                    {error ? (
+                        <div>Error: {error}</div>
+                    ) : reviews.length > 0 ? (
+                        reviews.map((review) => (
+                            <ReviewBox
+                                key={review._id}
+                                podcast={review.Podcast}
+                                reviewText={review.Comment}
+                                rating={review.Rating}
+                            />
+                        ))
+                    ) : (
+                        <div>No reviews found</div>
+                    )}
+                </div>
         </Navbar.Collapse>
       </Container>
     </Navbar>

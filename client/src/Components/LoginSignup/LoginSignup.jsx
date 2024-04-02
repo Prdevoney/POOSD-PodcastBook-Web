@@ -53,8 +53,7 @@ const LoginSignup = () => {
       }
     };
 
-
-  
+    
     const handleLogin = async () => {
       try {
         // Send login data to backend
