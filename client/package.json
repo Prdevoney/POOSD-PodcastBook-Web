@@ -10,6 +10,7 @@
     "bootstrap": "^5.3.3",
     "cors": "^2.8.5",
     "mongoose": "^8.2.4",
+    "podcast-api": "^2.0.4",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.2",
     "react-dom": "^18.2.0",
@@ -41,5 +42,4 @@
       "last 1 safari version"
     ]
   }
-  
 }

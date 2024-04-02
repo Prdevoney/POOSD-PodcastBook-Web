@@ -7,6 +7,9 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import './ExplorePage.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+
+const { Client } = require('podcast-api');
+
 const username = sessionStorage.getItem('username');
 console.log('Username:', username); // Output the retrieved username
 
@@ -20,12 +23,25 @@ const ReviewBox = ({ podcast, reviewText, rating }) => {
     );
   };
 
+const PodcastBox = ({ title, language, image, description }) => {
+    return (
+      <div className="review-box bg-light p-3 mb-3">
+        <img src={image} alt="Podcast Cover" className="img-thumbnail mb-3" />
+        <h5 className="card-title">Podcast: {title}</h5>
+        <p className="card-text">Language: {language}</p>
+        <p className="card-text">{description.length > 100 ? description.substring(0,100) + '...' : description} </p>
+      </div>
+    );
+  };
+
 const ExplorePodcasts =() =>{
   const [reviews, setReviews] = useState([]);
+  const [podcasts, setPodcasts] = useState([]);
   const [error, setError] = useState(null);
   const [searchType, setSearchType] = useState('Podcast');
   const [searchInput, setSearchInput] = useState('');
-  const handleSearch = async () => {
+
+  const handleSearch = async () => { //This does not work! Still in progress
     try {
         const response = await fetch('http://localhost:3000/api/getReview', {
             method: 'POST',
@@ -37,8 +53,8 @@ const ExplorePodcasts =() =>{
                 SearchType: searchType,
                 SearchInput: searchInput
             })
+            
         });
-
         if (response.ok) {
             const data = await response.json();
             setReviews(data);
@@ -53,26 +69,35 @@ const ExplorePodcasts =() =>{
         setReviews([]);
     }
 };
+
   useEffect(() => {
     const fetchReviews = async () => {
         try {
-            const response = await fetch('http://localhost:3000/api/feed', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    UserID: sessionStorage.getItem('username')
-                })
+
+            const client = Client({ apiKey: 'cd44e85a1c4b476ebdb04ab205b5af8d' });
+              client.fetchBestPodcasts({
+              region: 'us',
+              sort: 'listen_score',
+              safe_mode: 0,
+            
+            }).then((response) => {
+
+              //console.log(response.data.podcasts);
+              //console.log(response.data.podcasts.length);
+
+              setPodcasts(response.data.podcasts);
+
+              console.log(podcasts);
+              //console.log(podcasts.length);
+          
+
+            }).catch((error) => {
+
+              console.log(error)
+
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                setReviews(data);
-            } else {
-                setError('Error fetching reviews');
-            }
-        } catch (error) {
+        } catch (error) { //Probably redundant, but didn't want to mess anything up
             console.error('Error fetching reviews:', error);
             setError('Error fetching reviews');
         }
@@ -84,6 +109,7 @@ const ExplorePodcasts =() =>{
   
 
   return (
+  <div className="container">
   <Navbar expand="sm" className="navbar-container" /*bg="primary" data-bs-theme="dark"*/  >
       <Container fluid >
         <Navbar.Brand href="#">Podcast Book</Navbar.Brand>
@@ -112,25 +138,26 @@ const ExplorePodcasts =() =>{
             />
             <Button variant="outline-light" onClick={handleSearch}>Search</Button>
           </Form>
-          <div className="review-container">
+        </Navbar.Collapse>
+      </Container>
+    </Navbar> 
+    <div className="review-container"> 
                     {error ? (
                         <div>Error: {error}</div>
-                    ) : reviews.length > 0 ? (
-                        reviews.map((review) => (
-                            <ReviewBox
-                                key={review._id}
-                                podcast={review.Podcast}
-                                reviewText={review.Comment}
-                                rating={review.Rating}
+                    ) : podcasts.length > 0 ? (
+                        podcasts.map((podcast) => (
+                            <PodcastBox
+                                title={podcast.title}
+                                language={podcast.language}
+                                image={podcast.image}
+                                description={podcast.description}
                             />
                         ))
                     ) : (
                         <div>No reviews found</div>
                     )}
-                </div>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+      </div>
+    </div>
   );
 }
 
