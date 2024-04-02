@@ -10,6 +10,7 @@
     },
     "dependencies": {
         "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+        "axios": "^1.6.8",
         "bcrypt": "^5.1.1",
         "bootstrap": "^5.3.3",
         "cookie-parser": "~1.4.4",
