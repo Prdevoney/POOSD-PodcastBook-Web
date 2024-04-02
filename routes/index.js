@@ -494,14 +494,14 @@ router.post('/FollowUser', async (req, res) => {
 router.post('/SearchUser', async (req, res) => {
     try {
         // Extract username and password from request body
-        const {Username} = req.body;
+        const {MyUser, Username} = req.body;
         console.log("Searching for user", Username);
         await client.connect();
 
         const db = client.db("Podcast");
         const collection = db.collection('User');
 
-        const users = await collection.find({ Username: {$regex: new RegExp(Username, 'i')} }).toArray();
+        const users = await collection.find({ Username: {$ne: MyUser, $regex: new RegExp(Username, 'i')}}).toArray();
 
         // const results = await db.collection('Cards').find({"Card":{$regex:_search+'.*', $options:'r'}}).toArray();
 
