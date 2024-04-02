@@ -419,6 +419,12 @@ router.post('/getFollowing', async (req, res) => {
     }
 });
 
+  // followuser[My UserID, The TargetID i want to follow]
+  // If MyUserID = 65ef7003e62b8bf051c994c6
+  // MyTargetID = 65efa246e62b8bf051c994c7
+  // I.E FollowUser[MyUserID, MyTargetID]
+  // follows the user by adding them from the users following array and to the targets followed array
+
 router.post('/FollowUser', async (req, res) => {
     try {
       const { UserID, targetUserID } = req.body;
@@ -454,6 +460,12 @@ router.post('/FollowUser', async (req, res) => {
       res.status(500).json({ error: "An error occurred while Following user" });
     }
   });
+
+  // Unfollowuser[My UserID, The TargetID i want to unfollow]
+  // If MyUserID = 65ef7003e62b8bf051c994c6
+  // MyTargetID = 65efa246e62b8bf051c994c7
+  // I.E UnFollowUser[MyUserID, MyTargetID]
+  // Unfollows the user by removing them from the users following array and from the targets followed array
 
   router.post('/UnFollowUser', async (req, res) => {
     try {
