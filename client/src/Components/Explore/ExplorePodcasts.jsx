@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
@@ -11,11 +11,41 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const { Client } = require('podcast-api');
 
+
+const ReviewBox = ({ podcast, reviewText, rating }) => {
+    return (
+      <div className="review-box bg-light p-3 mb-3">
+        <h5 className="card-title">Podcast: {podcast}</h5>
+        <p className="card-text">{reviewText.length > 100 ? reviewText.substring(0, 100) + '...' : reviewText}</p>
+        <p className="card-text">Rating: {rating}</p>
+      </div>
+    );
+  };
+
+const PodcastBox = ({ title, language, image, description }) => {
+    return (
+      <div className="review-box bg-light p-3 mb-3">
+        <img src={image} alt="Podcast Cover" className="img-thumbnail mb-3" />
+        <h5 className="card-title">Podcast: {title}</h5>
+        <p className="card-text">Language: {language}</p>
+        <p className="card-text">{description.length > 100 ? description.substring(0,100) + '...' : description} </p>
+      </div>
+    );
+  };
+
+
+
 const ExplorePodcasts =() =>{
 
   const [searchQuery, setSearchQuery] = useState('');
   const [podcasts, setPodcasts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
+  const [error, setError] = useState('');
+  const [reviews, setReviews] = useState([]);
+  const [searchType, setSearchType] = useState('Podcast');
+  const [searchInput, setSearchInput] = useState('');
+
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
@@ -23,6 +53,7 @@ const ExplorePodcasts =() =>{
 
   const fetchPodcasts = async () => {
     setIsLoading(true);
+    setHasSearched(true);
     const client = Client({ apiKey: 'fbc6a6fd278f4f91a42b56cbd0f911f0' });
     try {
       // Use the search method from the client
@@ -42,6 +73,42 @@ const ExplorePodcasts =() =>{
       setIsLoading(false);
     }
   };
+
+useEffect(() => {
+ const fetchReviews = async () => {
+        try {
+
+            const client = Client({ apiKey: 'fbc6a6fd278f4f91a42b56cbd0f911f0' });
+              client.fetchBestPodcasts({
+              region: 'us',
+              sort: 'listen_score',
+              safe_mode: 0,
+            
+            }).then((response) => {
+
+              //console.log(response.data.podcasts);
+              //console.log(response.data.podcasts.length);
+
+              setPodcasts(response.data.podcasts);
+
+              console.log(podcasts);
+              //console.log(podcasts.length);
+          
+
+            }).catch((error) => {
+
+              console.log(error)
+
+            });
+
+        } catch (error) { //Probably redundant, but didn't want to mess anything up
+            console.error('Error fetching reviews:', error);
+            setError('Error fetching reviews');
+        }
+    };
+
+    fetchReviews();
+  }, []);
 
 
   return (
@@ -67,7 +134,7 @@ const ExplorePodcasts =() =>{
         {/* Search Form */}
       
 
-      <Form className="d-flex" onSubmit={(e) => e.preventDefault()}>
+        <Form className="d-flex" onSubmit={(e) => e.preventDefault()}>
 
         <Form.Select className = "me-3" style={{width: '110px'}} aria-label="Default select example">
           <option value="1">Podcast</option>
@@ -84,24 +151,46 @@ const ExplorePodcasts =() =>{
         />
 
         <Button variant="outline-light" onClick={fetchPodcasts}>Search</Button>
-      </Form>
+        </Form>
 
       {/* Display area for podcasts */}
-      <Container className="mt-3">
-        {isLoading ? (
-          <div>Loading...</div>
-        ) : (
-          podcasts.map((podcast, index) => (
-            <div key={index} className="podcast-item">
-              <Image src={podcast.image} alt="podcast thumbnail" />
-              <h5>{podcast.publisher_original}</h5>
-              <p>{podcast.description_highlighted}</p>
-              {/* Render more podcast details as needed */}
-            </div>
-          ))
-        )}
-      </Container>
+    <div>
+      {!hasSearched ? (
 
+        <div className="review-container">
+          {error ? (
+            <div>Error: {error}</div>
+          ) : podcasts.length > 0 ? (
+            podcasts.map((podcast) => (
+              <PodcastBox
+                key={podcast.id} // Assuming each podcast has a unique 'id'
+                title={podcast.title}
+                language={podcast.language}
+                image={podcast.image}
+                description={podcast.description}
+              />
+            ))
+          ) : (
+            <div>No reviews found</div>
+          )}
+        </div>
+      ) : (
+          <Container className="mt-3"> 
+            {isLoading ? (
+              <div>Loading...</div>
+            ) : (
+              podcasts.map((podcast, index) => (
+                <div key={index} className="podcast-item">
+                  <Image src={podcast.image} alt="podcast thumbnail" />
+                  <h5>{podcast.title_original}</h5>
+                  <p>{podcast.description_highlighted}</p>
+                  {/* Render more podcast details as needed */}
+                </div>
+              ))
+            )}
+        </Container>
+      )}
+    </div>
       </Container>
     </div>
   );
