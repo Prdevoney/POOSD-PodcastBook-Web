@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import NavDropdown from 'react-bootstrap/NavDropdown';
+// import NavDropdown from 'react-bootstrap/NavDropdown';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
@@ -12,15 +12,15 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const { Client } = require('podcast-api');
 
 
-const ReviewBox = ({ podcast, reviewText, rating }) => {
-    return (
-      <div className="review-box bg-light p-3 mb-3">
-        <h5 className="card-title">Podcast: {podcast}</h5>
-        <p className="card-text">{reviewText.length > 100 ? reviewText.substring(0, 100) + '...' : reviewText}</p>
-        <p className="card-text">Rating: {rating}</p>
-      </div>
-    );
-  };
+// const ReviewBox = ({ podcast, reviewText, rating }) => {
+//     return (
+//       <div className="review-box bg-light p-3 mb-3">
+//         <h5 className="card-title">Podcast: {podcast}</h5>
+//         <p className="card-text">{reviewText.length > 100 ? reviewText.substring(0, 100) + '...' : reviewText}</p>
+//         <p className="card-text">Rating: {rating}</p>
+//       </div>
+//     );
+//   };
 
 const PodcastBox = ({ title, language, image, description }) => {
     return (
@@ -42,9 +42,9 @@ const ExplorePodcasts =() =>{
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState('');
-  const [reviews, setReviews] = useState([]);
-  const [searchType, setSearchType] = useState('Podcast');
-  const [searchInput, setSearchInput] = useState('');
+  // const [reviews, setReviews] = useState([]);
+  // const [searchType, setSearchType] = useState('Podcast');
+  // const [searchInput, setSearchInput] = useState('');
 
 
   const handleSearchChange = (e) => {
@@ -54,7 +54,7 @@ const ExplorePodcasts =() =>{
   const fetchPodcasts = async () => {
     setIsLoading(true);
     setHasSearched(true);
-    const client = Client({ apiKey: 'fbc6a6fd278f4f91a42b56cbd0f911f0' });
+    const client = Client({ apiKey: '' });
     try {
       // Use the search method from the client
       const response = await client.search({
@@ -75,10 +75,9 @@ const ExplorePodcasts =() =>{
   };
 
 useEffect(() => {
- const fetchReviews = async () => {
+ const fetchInitialPodcasts = async () => {
+        const client = Client({ apiKey: '' });
         try {
-
-            const client = Client({ apiKey: 'fbc6a6fd278f4f91a42b56cbd0f911f0' });
               client.fetchBestPodcasts({
               region: 'us',
               sort: 'listen_score',
@@ -86,15 +85,9 @@ useEffect(() => {
             
             }).then((response) => {
 
-              //console.log(response.data.podcasts);
-              //console.log(response.data.podcasts.length);
-
               setPodcasts(response.data.podcasts);
-
               console.log(podcasts);
-              //console.log(podcasts.length);
-          
-
+              
             }).catch((error) => {
 
               console.log(error)
@@ -107,8 +100,8 @@ useEffect(() => {
         }
     };
 
-    fetchReviews();
-  }, []);
+    fetchInitialPodcasts();
+  },[]);
 
 
   return (
