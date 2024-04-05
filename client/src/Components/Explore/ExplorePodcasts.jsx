@@ -87,7 +87,7 @@ useEffect(() => {
 
               setPodcasts(response.data.podcasts);
               console.log(podcasts);
-              
+
             }).catch((error) => {
 
               console.log(error)
@@ -101,7 +101,7 @@ useEffect(() => {
     };
 
     fetchInitialPodcasts();
-  },[]);
+  },);
 
 
   return (
