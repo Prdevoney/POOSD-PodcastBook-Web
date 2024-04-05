@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 const { validateUser, validate } = require('../middlewares/validator');
+const verifyToken = require('../middlewares/verification');
 const bcrypt = require('bcrypt');
 
 const url = 'mongodb+srv://apitest:apitest@cluster0.6ssywfd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
@@ -191,7 +192,7 @@ router.post('/verifyEmail', async (req, res) => {
     }
 });
 
-router.put('/updatePassword', async (req, res) => {
+router.put('/updatePassword', verifyToken, async (req, res) => {
     try {
         const { id, Password } = req.body;
 
@@ -233,7 +234,7 @@ router.put('/updatePassword', async (req, res) => {
     }
 });
 
-router.delete('/deleteUser', async (req, res) => {
+router.delete('/deleteUser', verifyToken, async (req, res) => {
     try {
         const { id } = req.body;
 
@@ -266,7 +267,7 @@ router.delete('/deleteUser', async (req, res) => {
 
 
 // Endpoint for toggling follow/unfollow status between a user and a target user.
-router.post('/followUnfollowToggle', async (req, res) => {
+router.post('/followUnfollowToggle', verifyToken, async (req, res) => {
     try {
         // Extract UserID and targetUserID from the request body
         const { UserID, targetUserID } = req.body;
@@ -338,7 +339,7 @@ router.post('/followUnfollowToggle', async (req, res) => {
 });
 
 // Endpoint for retrieving a users followers with pagination
-router.post('/getFollowers', async (req, res) => {
+router.post('/getFollowers', verifyToken, async (req, res) => {
     try {
         const { UserID, page = 1, limit = 10 } = req.body; // Default to page 1 and limit 10 if not provided
 
@@ -379,7 +380,7 @@ router.post('/getFollowers', async (req, res) => {
 });
 
 // Endpoint for retrieving users whom the specified user is following with pagination
-router.post('/getFollowing', async (req, res) => {
+router.post('/getFollowing', verifyToken, async (req, res) => {
     try {
         const { UserID, page = 1, limit = 10 } = req.body; // Default to page 1 and limit 10 if not provided
 
@@ -425,7 +426,7 @@ router.post('/getFollowing', async (req, res) => {
   // I.E FollowUser[MyUserID, MyTargetID]
   // follows the user by adding them from the users following array and to the targets followed array
 
-router.post('/FollowUser', async (req, res) => {
+router.post('/FollowUser', verifyToken, async (req, res) => {
     try {
       const { UserID, targetUserID } = req.body;
   
@@ -467,7 +468,7 @@ router.post('/FollowUser', async (req, res) => {
   // I.E UnFollowUser[MyUserID, MyTargetID]
   // Unfollows the user by removing them from the users following array and from the targets followed array
 
-  router.post('/UnFollowUser', async (req, res) => {
+  router.post('/UnFollowUser', verifyToken, async (req, res) => {
     try {
       const { UserID, targetUserID } = req.body;
   
@@ -503,7 +504,7 @@ router.post('/FollowUser', async (req, res) => {
     }
   });
 
-router.post('/SearchUser', async (req, res) => {
+router.post('/SearchUser', verifyToken, async (req, res) => {
     try {
         // Extract username and password from request body
         const {MyUser, Username} = req.body;

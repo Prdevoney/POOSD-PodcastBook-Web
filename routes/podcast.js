@@ -1,5 +1,7 @@
 var express = require('express');
 var router = express.Router();
+const jwt = require('jsonwebtoken');
+const verifyToken = require('../middlewares/verification');
 
 const url = 'mongodb+srv://apitest:apitest@cluster0.6ssywfd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 const MongoClient = require("mongodb").MongoClient;
@@ -8,7 +10,7 @@ client.connect(console.log("mongodb connected"));
 
 const { ObjectId } = require('mongodb');
 
-router.post('/writeReview', async (req, res) => {
+router.post('/writeReview', verifyToken, async (req, res) => {
   try {
     const { Podcast, Rating, Comment, Username, UserID } = req.body;
 
@@ -55,7 +57,7 @@ router.post('/writeReview', async (req, res) => {
 
 
 // Receives ReviewID or Podcast name string and UserID as input, and returns the review information as a JSON response
-router.post('/getReview', async (req, res) => {
+router.post('/getReview', verifyToken, async (req, res) => {
   try {
     const { ReviewID, Podcast, UserID } = req.body;
 
@@ -89,7 +91,7 @@ router.post('/getReview', async (req, res) => {
   }
 });
 
-router.put('/editReview', async (req, res) => {
+router.put('/editReview', verifyToken, async (req, res) => {
   try {
     const { ReviewID, Rating, Comment } = req.body;
 
@@ -145,7 +147,7 @@ router.put('/editReview', async (req, res) => {
   }
 });
 
-router.delete('/deleteReview', async (req, res) => {
+router.delete('/deleteReview', verifyToken, async (req, res) => {
   try {
     const { ReviewID } = req.body;
 
@@ -173,7 +175,7 @@ router.delete('/deleteReview', async (req, res) => {
 
 // Receives page and limit (for pagination) and Podcast name string as input, and returns an json array with every review for that Podcast
 // limit is the number of reviews wanted per page, and page is the number of the corresponding page being requested
-router.post('/podcastReviews', async (req, res) => {
+router.post('/podcastReviews', verifyToken, async (req, res) => {
   try {
     const { Podcast, page = 1, limit = 10 } = req.body;
 
@@ -220,7 +222,7 @@ router.post('/podcastReviews', async (req, res) => {
 
 // Receives page and limit (for pagination) and UserID as input, and returns an json array with every review by that user
 // limit is the number of reviews wanted per page, and page is the number of the corresponding page being requested
-router.post('/userReviews', async (req, res) => {
+router.post('/userReviews', verifyToken, async (req, res) => {
   try {
     const { UserID, page = 1, limit = 10 } = req.body;
 
@@ -265,7 +267,7 @@ router.post('/userReviews', async (req, res) => {
 });
 
 // Receives the Podcast name as input, and returns the average score for the Podcast
-router.post('/averageScore', async (req, res) => {
+router.post('/averageScore', verifyToken, async (req, res) => {
   try {
     const { Podcast } = req.body;
 
@@ -302,7 +304,7 @@ router.post('/averageScore', async (req, res) => {
 // This endpoint functions as a like toggle for reviews. Receives a ReviewID and UserID as input. If the UserID is not in the
 // LikedBy array, it adds it to the array and it increments LikeCount by 1. If the UserID is in the LikedBy array,
 // it removes it from the arrat and decrements LikeCount by 1
-router.post('/likeToggle', async (req, res) => {
+router.post('/likeToggle', verifyToken, async (req, res) => {
   try {
     const { ReviewID, UserID } = req.body;
 
@@ -346,7 +348,7 @@ router.post('/likeToggle', async (req, res) => {
 });
 
 // Endpoint to get chronological feed of reviews using pagination, based on a users Following array
-router.post('/feed', async (req, res) => {
+router.post('/feed', verifyToken, async (req, res) => {
   try {
       // Extract UserID, page, and limit from request body, defaults to page = 1 and limit = 10 if they are not given
       const { UserID, page = 1, limit = 10 } = req.body;
