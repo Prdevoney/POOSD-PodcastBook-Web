@@ -1,4 +1,19 @@
-.navbar-container {
-  /* background: linear-gradient(to right, #66d4ff, #325592); */
-  background-color: #41a0ff;
-}
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #ffffff; /* Same backdrop color as the login/signup page */
+  }
+  
+  .welcome-box {
+    background-color: #ffffff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .welcome-box h1 {
+    color: #455ec4;
+    text-align: center;
+  }

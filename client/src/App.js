@@ -1,11 +1,19 @@
 import './App.css';
-import LoginSignup from './Components/LoginSignup/LoginSignup.jsx';
-import ExplorePodcasts from './Components/Explore/ExplorePodcasts.jsx';
+import LoginSignup from './Components/LoginSignup/LoginSignup';
+import ExplorePodcasts from './Components/Explore/ExplorePodcasts';
+// new added ->
 import React from 'react';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+// end of new added ->
+
 
 function App() {
+
+// const fetchData = () => {
+//     fetch('/api/test')
+//       .then(response => response.json())
+//       .then(data => console.log(data));
+//   };
 
   return (
     <Router>
@@ -15,6 +23,12 @@ function App() {
       </Routes>
     </Router>
 
+    // old code ->
+    // <div>
+    //   <LoginSignup />
+    //   <ExplorePodcasts />
+    // </div>
+    // end of old code ->
   );
 }
 
