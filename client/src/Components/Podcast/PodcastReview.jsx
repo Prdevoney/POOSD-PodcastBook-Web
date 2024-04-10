@@ -70,9 +70,6 @@ function PodcastReview() {
                         </Row>
                     </Col>
                 </Row>
-                
-                
-               
             </Container>
 
         <Modal show={show} onHide={handleClose} centered>
