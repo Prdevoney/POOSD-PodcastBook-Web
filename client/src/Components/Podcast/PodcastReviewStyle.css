@@ -1,0 +1,12 @@
+input[type=radio] {
+    display: none;
+}
+
+.star{
+    cursor: pointer;
+}
+
+#reviewBoxes {
+  background: linear-gradient(to bottom, rgb(52, 120, 189), rgb(120, 151, 161));
+  color: white;
+}
