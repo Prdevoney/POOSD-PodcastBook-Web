@@ -530,4 +530,34 @@ router.post('/SearchUser', verifyToken, async (req, res) => {
     }
 });
 
+router.post('/getUserInfo', verifyToken, async (req, res) => {
+    try {
+        // Extract UserID from request body
+        const { UserID } = req.body;
+
+        // Connect to the MongoDB client
+        await client.connect();
+
+        // Get reference to the MongoDB database and the 'User' collection
+        const db = client.db("Podcast");
+        const collection = db.collection('User');
+
+        // Find the user by UserID
+        const user = await collection.findOne({ _id: new ObjectId(UserID) });
+
+        // If user not found, return 404 error
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // If user found, return user information
+        res.status(200).json({ user });
+
+    } catch (error) {
+        // Handle any errors that occur during the process
+        console.error("Error fetching user info:", error);
+        res.status(500).json({ error: "An error occurred while fetching user info" });
+    }
+});
+
 module.exports = router;
