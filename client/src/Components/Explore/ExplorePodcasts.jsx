@@ -20,17 +20,37 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const { Client } = require('podcast-api');
 
-const PodcastBox = ({ title, language, image, description }) => { //Box conatining podcast info obtained from podcast-api
+const PodcastBox = ({ title, language, image, description }) => {
+  const linkStyle = {
+    textDecoration: 'none',
+    color: 'inherit',
+  };
+
   return (
-    <div className="review-box bg-light p-3 mb-3">
-      <img src={image} width={250} height={250} alt="Podcast Cover" className="img-thumbnail mb-3" />
-      <h5 className="card-title">Podcast: {title}</h5>
-      <p className="card-text">Language: {language}</p>
-      <p className="card-text">{description.length > 100 ? description.substring(0,100) + '...' : description} </p>
-    </div>
+    <Link
+     to={{
+      pathname: '/review-podcast',
+      state: {
+      podcastData: {
+        title,
+        language,
+        image,
+        description,
+      },
+    },
+  }}
+  className="podcast-box"
+  style={linkStyle}
+>
+      <div className="review-box bg-light p-3 mb-3">
+        <img src={image} width={250} height={250} alt="Podcast Cover" className="img-thumbnail mb-3" />
+        <h5 className="card-title">Podcast: {title}</h5>
+        <p className="card-text">Language: {language}</p>
+        <p className="card-text">{description.length > 100 ? description.substring(0, 100) + '...' : description} </p>
+      </div>
+    </Link>
   );
 };
-
 
 const ExplorePodcasts =() =>{
   const location = useLocation();
@@ -84,25 +104,31 @@ const ExplorePodcasts =() =>{
 
   return (
     <div>
-    <Button as={Link} to="/review-podcast" variant="primary"> Review the podcast button </Button>
+  
     {data && <div>{JSON.stringify(data)}</div>}
     
-    <div className="review-container"> 
-                    {error ? (
-                        <div>Error: {error}</div>
-                    ) : podcasts.length > 0 ? (
-                        podcasts.map((podcast) => (
-                            <PodcastBox
-                                title={podcast.title}
-                                language={podcast.language}
-                                image={podcast.image}
-                                description={podcast.description}
-                            />
-                        ))
-                    ) : (
-                        <div>No reviews found</div>
-                    )}
-      </div>
+    <div className="review-container">
+      {error ? (
+        <div>Error: {error}</div>
+      ) : podcasts.length > 0 ? (
+        <div className="row row-cols-1 row-cols-md-4 g-4">
+          {podcasts.map((podcast, index) => (
+            <div className="col mb-4" key={index}>
+              <div className="podcast-box">
+                <PodcastBox
+                  title={podcast.title}
+                  language={podcast.language}
+                  image={podcast.image}
+                  description={podcast.description}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div>No podcasts found</div>
+      )}
+    </div>
 
     </div>
 
@@ -136,4 +162,3 @@ const ExplorePodcasts =() =>{
 }
 
 export default ExplorePodcasts;
-

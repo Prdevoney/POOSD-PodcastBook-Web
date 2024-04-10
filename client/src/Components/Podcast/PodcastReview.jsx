@@ -1,76 +1,76 @@
 import React from 'react';
-import {useState } from 'react';
-import {FaStar} from 'react-icons/fa';
+import { useState } from 'react';
+import { FaStar } from 'react-icons/fa';
 import { Button, Container, Modal, Form } from 'react-bootstrap';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import './PodcastReviewStyle.css';
 
-function PodcastReview() {
-    const [rating, setRating] = useState(null);
-    const [hover, setHover] = useState(null);
-    const [show, setShow] = useState(false);
-    const [review, setReview] = useState('');
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
-    const numberOfReviews = 8;
+function PodcastReview({ podcastData }) {
+  const [rating, setRating] = useState(null);
+  const [hover, setHover] = useState(null);
+  const [show, setShow] = useState(false);
+  const [review, setReview] = useState('');
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+  const numberOfReviews = 8;
 
-    const handleInputChange = (event) => {
-        setReview(event.target.value);
-      };
-    
-    const renderReviews = () => {
-        return [...Array(numberOfReviews)].map((_, index) => (
-            <Container key={index-1} id="reviewBoxes" className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white'}}>   
-            <h1>Reviews</h1>
-            <p>Fill in Podcast reviews... from our database</p>
+  const handleInputChange = (event) => {
+    setReview(event.target.value);
+  };
+
+  const renderReviews = () => {
+    return [...Array(numberOfReviews)].map((_, index) => (
+      <Container key={index-1} id="reviewBoxes" className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white'}}>   
+      <h1>Reviews</h1>
+      <p>Fill in Podcast reviews... from our database</p>
+    </Container>
+    ));
+  };
+
+  return (
+    <>
+      <Container className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white'}}>
+        <Row>
+          <Col sm={4}>
+            <Image src={podcastData?.image || "holder.js/171x180"} thumbnail />
+          </Col>
+          <Col>
+        <Row>
+          <Col>
+            <h1>{podcastData?.title || "Insert Podcast Title here"}</h1>
+          </Col>
+          <Col sm={3} className ='ml-auto'>
+            <Button variant="primary" onClick={handleShow}>Add Review</Button>
+          </Col>
+        </Row>
+        <Row>
+          <Container id='starBox' className = "my-1 p-1 ms-auto" style={{color: 'black'}}>
+            {[...Array(5)].map((star, index) => {
+              const currentRating = index + 1;
+              return (
+                <label key={index}>
+                  <input type = "radio" 
+                    name = "rating"
+                    value={currentRating}
+                  />
+                  <FaStar id = 'star' 
+                    size={30} 
+                    color = {'yellow'}
+                  /> 
+                </label>
+              ); 
+            })}
           </Container>
-        ));
-    };
+        </Row>
+        <Row>
+          <p>{podcastData?.description || "Fill in Podcast description..."}</p>
+        </Row>
+      </Col>
+    </Row>
+  </Container>
 
-    return (
-        <>
-        
-            <Container className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white'}}>
-                <Row>
-                    <Col sm={4}>
-                        <Image src="holder.js/171x180" thumbnail />
-                    </Col>
-                    <Col>
-                        <Row>
-                            <Col>
-                            <h1>Insert Podcast Title here</h1>
-                            </Col>
-                            <Col sm={3} className ='ml-auto'>
-                              <Button variant="primary" onClick={handleShow}>Add Review</Button>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Container id='starBox' className = "my-1 p-1 ms-auto" style={{color: 'black'}}>
-                            {[...Array(5)].map((star, index) => {
-                                const currentRating = index + 1;
-                                return (
-                                    <label key={index}>
-                                        <input type = "radio" 
-                                            name = "rating"
-                                            value={currentRating}
-                                        />
-                                        <FaStar id = 'star' 
-                                            size={30} 
-                                            color = {'yellow'}
-                                        /> 
-                                    </label>
-                                ); 
-                            })}
-                            </Container>
-                        </Row>
-                        <Row>
-                            <p>Fill in Podcast description...</p>
-                        </Row>
-                    </Col>
-                </Row>
-            </Container>
 
         <Modal show={show} onHide={handleClose} centered>
             <Modal.Header closeButton>
