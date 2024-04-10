@@ -18,12 +18,27 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 //write handle search api call
 
+const { Client } = require('podcast-api');
+
+const PodcastBox = ({ title, language, image, description }) => { //Box conatining podcast info obtained from podcast-api
+  return (
+    <div className="review-box bg-light p-3 mb-3">
+      <img src={image} width={250} height={250} alt="Podcast Cover" className="img-thumbnail mb-3" />
+      <h5 className="card-title">Podcast: {title}</h5>
+      <p className="card-text">Language: {language}</p>
+      <p className="card-text">{description.length > 100 ? description.substring(0,100) + '...' : description} </p>
+    </div>
+  );
+};
+
 
 const ExplorePodcasts =() =>{
   const location = useLocation();
   const encodedSearchTerm = location.state ? location.state.searchTerm : '';
   const searchTerm = decodeURIComponent(encodedSearchTerm);
   const [data, setData] = useState(null);
+  const [podcasts, setPodcasts] = useState([]);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (searchTerm) {
@@ -37,10 +52,58 @@ const ExplorePodcasts =() =>{
     }
   }, [searchTerm]);
 
+  useEffect(() => {
+    const fetchReviews = async () => {
+        try {
+
+            const client = Client({ apiKey: '' });
+              client.fetchBestPodcasts({
+              region: 'us',
+              sort: 'listen_score',
+              safe_mode: 0,
+            
+            }).then((response) => {
+
+              setPodcasts(response.data.podcasts);
+              console.log(podcasts);
+              
+            }).catch((error) => {
+
+              console.log(error)
+
+            });
+
+        } catch (error) { //Probably redundant, but didn't want to mess anything up
+            console.error('Error fetching reviews:', error);
+            setError('Error fetching reviews');
+        }
+    };
+
+    fetchReviews();
+  }, []);
+
   return (
     <div>
     <Button as={Link} to="/review-podcast" variant="primary"> Review the podcast button </Button>
     {data && <div>{JSON.stringify(data)}</div>}
+    
+    <div className="review-container"> 
+                    {error ? (
+                        <div>Error: {error}</div>
+                    ) : podcasts.length > 0 ? (
+                        podcasts.map((podcast) => (
+                            <PodcastBox
+                                title={podcast.title}
+                                language={podcast.language}
+                                image={podcast.image}
+                                description={podcast.description}
+                            />
+                        ))
+                    ) : (
+                        <div>No reviews found</div>
+                    )}
+      </div>
+
     </div>
 
 /* <Navbar expand="sm" className="navbar-container" bg="primary" data-bs-theme="dark"  >
