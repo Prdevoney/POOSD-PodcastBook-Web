@@ -2,23 +2,17 @@ import './ExplorePageStyle.css';
 import { useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
-// import { useLocation } from 'react-router-dom';
- 
-// import React from 'react';
-// import Container from 'react-bootstrap/Container';
-// import Nav from 'react-bootstrap/Nav';
-// import Navbar from 'react-bootstrap/Navbar';
 import Button from 'react-bootstrap/Button';
-// import Form from 'react-bootstrap/Form';
+
 import { Link } from 'react-router-dom';
 
-// import { NavLink } from 'react-router-dom';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 //write handle search api call
 
 const { Client } = require('podcast-api');
+
 
 const PodcastBox = ({ title, language, image, description }) => {
   const linkStyle = {
@@ -28,29 +22,30 @@ const PodcastBox = ({ title, language, image, description }) => {
 
   return (
     <Link
-     to={{
-      pathname: '/review-podcast',
-      state: {
-      podcastData: {
-        title,
-        language,
-        image,
-        description,
-      },
-    },
-  }}
-  className="podcast-box"
-  style={linkStyle}
->
+      to={{
+        pathname: '/review-podcast',
+        state: {
+          podcastData: {
+            title,
+            language,
+            image,
+            description,
+          },
+        },
+      }}
+      className="podcast-box"
+      style={linkStyle}
+    >
       <div className="review-box bg-light p-3 mb-3">
         <img src={image} width={250} height={250} alt="Podcast Cover" className="img-thumbnail mb-3" />
         <h5 className="card-title">Podcast: {title}</h5>
         <p className="card-text">Language: {language}</p>
-        <p className="card-text">{description.length > 100 ? description.substring(0, 100) + '...' : description} </p>
+        <p className="card-text">{description.length > 100 ? description.substring(0, 100) + '...' : description}</p>
       </div>
     </Link>
   );
 };
+
 
 const ExplorePodcasts =() =>{
   const location = useLocation();

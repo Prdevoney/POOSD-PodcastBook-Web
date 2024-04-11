@@ -6,8 +6,11 @@ import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import './PodcastReviewStyle.css';
+import { useLocation } from 'react-router-dom';
 
-function PodcastReview({ podcastData }) {
+function PodcastReview() {
+  const location = useLocation();
+  const { podcastData } = location.state || {};
   const [rating, setRating] = useState(null);
   const [hover, setHover] = useState(null);
   const [show, setShow] = useState(false);
