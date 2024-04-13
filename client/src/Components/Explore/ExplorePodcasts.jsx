@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-// import NavDropdown from 'react-bootstrap/NavDropdown';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
@@ -11,16 +10,12 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const { Client } = require('podcast-api');
 
+/* use for actuall data*/
+// const API_KEY = 'fbc6a6fd278f4f91a42b56cbd0f911f0';
 
-// const ReviewBox = ({ podcast, reviewText, rating }) => {
-//     return (
-//       <div className="review-box bg-light p-3 mb-3">
-//         <h5 className="card-title">Podcast: {podcast}</h5>
-//         <p className="card-text">{reviewText.length > 100 ? reviewText.substring(0, 100) + '...' : reviewText}</p>
-//         <p className="card-text">Rating: {rating}</p>
-//       </div>
-//     );
-//   };
+/* use for testing */
+const API_KEY = '';
+
 
 const PodcastBox = ({ title, language, image, description }) => {
     return (
@@ -38,35 +33,60 @@ const PodcastBox = ({ title, language, image, description }) => {
 const ExplorePodcasts =() =>{
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchType, setSearchType] = useState('podcast');
+  const [lastSearchType, setLastSearchType] = useState('podcast');
   const [podcasts, setPodcasts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState('');
-  // const [reviews, setReviews] = useState([]);
-  // const [searchType, setSearchType] = useState('Podcast');
-  // const [searchInput, setSearchInput] = useState('');
 
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
 
+  const handleTypeChange = (e) => {
+    setSearchType(e.target.value);
+  };
+
+
+  const handlePlayAudio = (audioUrl) => {
+    window.open(audioUrl, '_blank');
+  };
+
+  const getEpisode = async (podcastId) => {
+
+    const client = Client({ apiKey: API_KEY });
+    try{
+      const response = await client.fetchPodcastById({
+        id: podcastId,
+        sort: 'recent_first',
+      });
+
+      console.log('Episodes:', response.data.episodes);
+      window.open(response.data.episodes[0].audio, '_blank')
+
+    } catch(error){
+      console.error('Error fetching podcasts:', error);
+    }
+  };
+
   const fetchPodcasts = async () => {
     setIsLoading(true);
     setHasSearched(true);
-    const client = Client({ apiKey: '' });
+    const client = Client({ apiKey: API_KEY });
     try {
       // Use the search method from the client
       const response = await client.search({
         q: searchQuery,
-        type: 'podcast', 
+        type: searchType, 
         language: 'English',
         region: 'us'
       });
 
       console.log('Podcasts:', response.data.results);
-      // Set the search results. Adjust according to the actual response structure.
       setPodcasts(response.data.results);
+      setLastSearchType(searchType);
     } catch (error) {
       console.error('Error fetching podcasts:', error);
     } finally {
@@ -76,7 +96,7 @@ const ExplorePodcasts =() =>{
 
 useEffect(() => {
  const fetchInitialPodcasts = async () => {
-        const client = Client({ apiKey: '' });
+        const client = Client({ apiKey: API_KEY });
         try {
               client.fetchBestPodcasts({
               region: 'us',
@@ -86,8 +106,11 @@ useEffect(() => {
             }).then((response) => {
 
               setPodcasts(response.data.podcasts);
-              console.log(podcasts);
 
+              // DO NOT UN-COMMENT THE LINE BELOW
+              // console.log('podcast:' + podcasts);
+
+              console.log('hello');
             }).catch((error) => {
 
               console.log(error)
@@ -101,8 +124,7 @@ useEffect(() => {
     };
 
     fetchInitialPodcasts();
-  },);
-
+  },[]);
 
   return (
     <div> {/* Wrap the elements inside a parent div */}
@@ -129,9 +151,9 @@ useEffect(() => {
 
         <Form className="d-flex" onSubmit={(e) => e.preventDefault()}>
 
-        <Form.Select className = "me-3" style={{width: '110px'}} aria-label="Default select example">
-          <option value="1">Podcast</option>
-          <option value="2">Episode</option>
+        <Form.Select className = "me-3" style={{width: '110px'}} aria-label="Default select example" value={searchType} onChange={handleTypeChange}>
+          <option value="podcast">Podcast</option>
+          <option value="episode">Episode</option>
         </Form.Select>
 
         <Form.Control
@@ -145,45 +167,62 @@ useEffect(() => {
 
         <Button variant="outline-light" onClick={fetchPodcasts}>Search</Button>
         </Form>
-
-      {/* Display area for podcasts */}
-    <div>
-      {!hasSearched ? (
-
-        <div className="review-container">
-          {error ? (
-            <div>Error: {error}</div>
-          ) : podcasts.length > 0 ? (
-            podcasts.map((podcast) => (
-              <PodcastBox
-                key={podcast.id} // Assuming each podcast has a unique 'id'
-                title={podcast.title}
-                language={podcast.language}
-                image={podcast.image}
-                description={podcast.description}
-              />
-            ))
+        <div>
+          {hasSearched ? (
+            lastSearchType === 'podcast' ? (
+              <Container className="mt-3">
+                {isLoading ? (
+                  <div>Loading...</div>
+                ) : (
+                  podcasts.map((podcast, index) => (
+                    <div key={index} className="podcast-item">
+                      <h1>This is for Podcasts</h1>
+                      <Image src={podcast.image} alt="podcast thumbnail" />
+                      <Button variant="primary" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
+                      <h5>{podcast.title_original}</h5>
+                      <p>{podcast.description_highlighted}</p>
+                    </div>
+                  ))
+                )}
+              </Container>
+            ) : lastSearchType === 'episode' ? (
+              <Container className="mt-3">
+                {isLoading ? (
+                  <div>Loading...</div>
+                ) : (
+                  podcasts.map((episode, index) => (
+                    <div key={index} className="episode-item">
+                      <h1>This is for Episodes</h1>
+                      <Image src={episode.image} alt="episode thumbnail" />
+                      <Button variant="primary" onClick={() => handlePlayAudio(episode.audio)}>Play Episode</Button>
+                      <h5>{episode.title_original}</h5>
+                      <p>{episode.description_highlighted}</p>
+                    </div>
+                  ))
+                )}
+              </Container>
+            ) : null
           ) : (
-            <div>No reviews found</div>
+            <div className="review-container">
+              {error ? (
+                <div>Error: {error}</div>
+              ) : podcasts.length > 0 ? (
+                podcasts.map((podcast) => (
+                  <PodcastBox
+                    key={podcast.id} // Assuming each podcast has a unique 'id'
+                    title={podcast.title}
+                    language={podcast.language}
+                    image={podcast.image}
+                    description={podcast.description}
+                  />
+                ))
+              ) : (
+                <div>No reviews found</div>
+              )}
+            </div>
           )}
         </div>
-      ) : (
-          <Container className="mt-3"> 
-            {isLoading ? (
-              <div>Loading...</div>
-            ) : (
-              podcasts.map((podcast, index) => (
-                <div key={index} className="podcast-item">
-                  <Image src={podcast.image} alt="podcast thumbnail" />
-                  <h5>{podcast.title_original}</h5>
-                  <p>{podcast.description_highlighted}</p>
-                  {/* Render more podcast details as needed */}
-                </div>
-              ))
-            )}
-        </Container>
-      )}
-    </div>
+
       </Container>
     </div>
   );
