@@ -13,10 +13,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const { Client } = require('podcast-api');
 
 /* use for actuall data*/
-// const API_KEY = 'fbc6a6fd278f4f91a42b56cbd0f911f0';
+const API_KEY = 'fbc6a6fd278f4f91a42b56cbd0f911f0';
 
 /* use for testing */
-const API_KEY = '';
+// const API_KEY = '';
 
 const ExplorePodcasts =() =>{
 
@@ -28,7 +28,7 @@ const ExplorePodcasts =() =>{
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState('');
 
-  const [audioSrc, setAudioSrc] = useState(null);
+  const [currentEpisode, setCurrentEpisode] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
   const handleSearchChange = (e) => {
@@ -40,9 +40,11 @@ const ExplorePodcasts =() =>{
   };
 
 
-  const handlePlayAudio = (audioUrl) => {
-    setAudioSrc(audioUrl);
-    setShowModal(true);
+  const handleCurrentEpisode = (currEpisode) => {
+     console.log("Episode data received:", currEpisode);
+
+      setCurrentEpisode(currEpisode);
+      setShowModal(true);
   };
 
   const getEpisode = async (podcastId) => {
@@ -55,7 +57,7 @@ const ExplorePodcasts =() =>{
       });
 
       console.log('Episodes:', response.data.episodes);
-      handlePlayAudio(response.data.episodes[0].audio);
+      handleCurrentEpisode(response.data.episodes[0]);
 
     } catch(error){
       console.error('Error fetching podcasts:', error);
@@ -75,7 +77,7 @@ const ExplorePodcasts =() =>{
         region: 'us'
       });
 
-      console.log('Podcasts:', response.data.results);
+      console.log('Podcasts/Episodes:', response.data.results);
       setPodcasts(response.data.results);
       setLastSearchType(searchType);
     } catch (error) {
@@ -98,17 +100,14 @@ useEffect(() => {
 
               setPodcasts(response.data.podcasts);
 
-              // DO NOT UN-COMMENT THE LINE BELOW
-              // console.log('podcast:' + podcasts);
-
-              console.log('hello');
+              console.log('Best Podcasts:', response.data.podcasts);
             }).catch((error) => {
 
               console.log(error)
 
             });
 
-        } catch (error) { //Probably redundant, but didn't want to mess anything up
+        } catch (error) { 
             console.error('Error fetching reviews:', error);
             setError('Error fetching reviews');
         }
@@ -134,24 +133,24 @@ useEffect(() => {
         </Container>
       </Navbar>
 
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+      <Modal show={showModal} onHide={() => {setShowModal(false); setCurrentEpisode(null);}} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Audio Player</Modal.Title>
+          <Modal.Title>{currentEpisode ? currentEpisode.title : 'Loading...'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {currentEpisode ? (
           <audio controls autoPlay>
-            <source src={audioSrc} type="audio/mpeg" />
+            <source src={currentEpisode.audio} type="audio/mpeg" />
             Your browser does not support the audio element.
           </audio>
+          ) : (
+            <p>Loading...</p>
+          )}
         </Modal.Body>
       </Modal>
 
 
       <Container>
-        <p>Explore Podcasts</p>
-
-        {/* Search Form */}
-      
 
         <Form className="d-flex" onSubmit={(e) => e.preventDefault()}>
 
@@ -180,7 +179,6 @@ useEffect(() => {
                 ) : (
                   podcasts.map((podcast, index) => (
                     <div key={index} className="podcast-item">
-                      <h1>This is for Podcasts</h1>
                       <Image src={podcast.image} alt="podcast thumbnail" />
                       <Button variant="primary" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
                       <h5>{podcast.title_original}</h5>
@@ -196,9 +194,8 @@ useEffect(() => {
                 ) : (
                   podcasts.map((episode, index) => (
                     <div key={index} className="episode-item">
-                      <h1>This is for Episodes</h1>
                       <Image src={episode.image} alt="episode thumbnail" />
-                      <Button variant="primary" onClick={() => handlePlayAudio(episode.audio)}>Play Episode</Button>
+                      <Button variant="primary" onClick={() => handleCurrentEpisode(episode)}>Play Episode</Button>
                       <h5>{episode.title_original}</h5>
                       <p>{episode.description_highlighted}</p>
                     </div>
