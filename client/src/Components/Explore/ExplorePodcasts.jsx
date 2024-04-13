@@ -5,6 +5,8 @@ import Navbar from 'react-bootstrap/Navbar';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
+import Modal from 'react-bootstrap/Modal';
+import Card from 'react-bootstrap/Card';
 import './ExplorePage.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -16,20 +18,6 @@ const { Client } = require('podcast-api');
 /* use for testing */
 const API_KEY = '';
 
-
-const PodcastBox = ({ title, language, image, description }) => {
-    return (
-      <div className="review-box bg-light p-3 mb-3">
-        <img src={image} alt="Podcast Cover" className="img-thumbnail mb-3" />
-        <h5 className="card-title">Podcast: {title}</h5>
-        <p className="card-text">Language: {language}</p>
-        <p className="card-text">{description.length > 100 ? description.substring(0,100) + '...' : description} </p>
-      </div>
-    );
-  };
-
-
-
 const ExplorePodcasts =() =>{
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -40,6 +28,8 @@ const ExplorePodcasts =() =>{
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState('');
 
+  const [audioSrc, setAudioSrc] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
@@ -51,7 +41,8 @@ const ExplorePodcasts =() =>{
 
 
   const handlePlayAudio = (audioUrl) => {
-    window.open(audioUrl, '_blank');
+    setAudioSrc(audioUrl);
+    setShowModal(true);
   };
 
   const getEpisode = async (podcastId) => {
@@ -64,7 +55,7 @@ const ExplorePodcasts =() =>{
       });
 
       console.log('Episodes:', response.data.episodes);
-      window.open(response.data.episodes[0].audio, '_blank')
+      handlePlayAudio(response.data.episodes[0].audio);
 
     } catch(error){
       console.error('Error fetching podcasts:', error);
@@ -143,6 +134,19 @@ useEffect(() => {
         </Container>
       </Navbar>
 
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Audio Player</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <audio controls autoPlay>
+            <source src={audioSrc} type="audio/mpeg" />
+            Your browser does not support the audio element.
+          </audio>
+        </Modal.Body>
+      </Modal>
+
+
       <Container>
         <p>Explore Podcasts</p>
 
@@ -207,14 +211,15 @@ useEffect(() => {
               {error ? (
                 <div>Error: {error}</div>
               ) : podcasts.length > 0 ? (
-                podcasts.map((podcast) => (
-                  <PodcastBox
-                    key={podcast.id} // Assuming each podcast has a unique 'id'
-                    title={podcast.title}
-                    language={podcast.language}
-                    image={podcast.image}
-                    description={podcast.description}
-                  />
+                podcasts.map((podcast, index) => (
+                  <div key={index} className="review-box bg-light p-3 mb-3">
+                    <img src={podcast.image} alt="Podcast Cover" className="img-thumbnail mb-3" />
+                    <h5 className="card-title">Podcast: {podcast.title}</h5>
+                    <p className="card-text">Language: {podcast.language}</p>
+                    <p className="card-text">{podcast.description.length > 100 ? podcast.description.substring(0,100) + '...' : podcast.description} </p>
+                    <Button variant="primary" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
+                  </div>
+                  
                 ))
               ) : (
                 <div>No reviews found</div>
