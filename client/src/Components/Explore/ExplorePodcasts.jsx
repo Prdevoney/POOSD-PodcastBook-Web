@@ -43,7 +43,6 @@ const ExplorePodcasts =() =>{
     setSearchType(e.target.value);
   };
 
-
   const handleCurrentEpisode = (currEpisode) => {
      console.log("Episode data received:", currEpisode);
 
@@ -113,33 +112,33 @@ const ExplorePodcasts =() =>{
     }
   };
 
-useEffect(() => {
- const fetchInitialPodcasts = async () => {
-        const client = Client({ apiKey: API_KEY });
-        try {
-              client.fetchBestPodcasts({
-              region: 'us',
-              sort: 'listen_score',
-              safe_mode: 0,
-            
-            }).then((response) => {
+  useEffect(() => {
+    const fetchInitialPodcasts = async () => {
+          const client = Client({ apiKey: API_KEY });
+          try {
+                client.fetchBestPodcasts({
+                region: 'us',
+                sort: 'listen_score',
+                safe_mode: 0,
+              
+              }).then((response) => {
 
-              setPodcasts(response.data.podcasts);
+                setPodcasts(response.data.podcasts);
 
-              console.log('Best Podcasts:', response.data.podcasts);
-            }).catch((error) => {
+                console.log('Best Podcasts:', response.data.podcasts);
+              }).catch((error) => {
 
-              console.log(error)
+                console.log(error)
 
-            });
+              });
 
-        } catch (error) { 
-            console.error('Error fetching reviews:', error);
-            setError('Error fetching reviews');
-        }
-    };
+          } catch (error) { 
+              console.error('Error fetching reviews:', error);
+              setError('Error fetching reviews');
+          }
+      };
 
-    fetchInitialPodcasts();
+      fetchInitialPodcasts();
   },[]);
 
   return (
