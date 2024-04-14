@@ -33,6 +33,7 @@ const ExplorePodcasts =() =>{
   const [currentEpisode, setCurrentEpisode] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
+  
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
