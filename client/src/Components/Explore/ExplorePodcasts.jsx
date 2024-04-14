@@ -1,4 +1,6 @@
 import React, {useState, useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
@@ -7,19 +9,21 @@ import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
 import Modal from 'react-bootstrap/Modal';
 import Card from 'react-bootstrap/Card';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
 import './ExplorePage.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const { Client } = require('podcast-api');
 
 /* use for actuall data*/
-const API_KEY = 'fbc6a6fd278f4f91a42b56cbd0f911f0';
+// const API_KEY = 'fbc6a6fd278f4f91a42b56cbd0f911f0';
 
 /* use for testing */
-// const API_KEY = '';
+const API_KEY = '';
 
 const ExplorePodcasts =() =>{
-
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchType, setSearchType] = useState('podcast');
   const [lastSearchType, setLastSearchType] = useState('podcast');
@@ -45,6 +49,28 @@ const ExplorePodcasts =() =>{
 
       setCurrentEpisode(currEpisode);
       setShowModal(true);
+  };
+
+  const handleReview = (data) => {
+    const dataForReview = normalizeData(data);
+    navigate('/review', {state: {reviewData: dataForReview}});
+  };
+
+  const normalizeData = (data) => {
+    const normalizedData = {
+      title: data.title_original || data.title,
+      image: data.image,
+      description: data.description_original || data.description,
+      id: data.id,
+      type: data.audio ? 'episode' : 'podcast',
+    }
+
+    if (data.audio) {
+      normalizedData.audio = data.audio;
+    } else {
+      normalizedData.episodeCount = data.total_episodes;
+    }
+    return normalizedData;
   };
 
   const getEpisode = async (podcastId) => {
@@ -152,23 +178,21 @@ useEffect(() => {
 
       <Container>
 
-        <Form className="d-flex" onSubmit={(e) => e.preventDefault()}>
+        <Form className="d-flex my-4" onSubmit={(e) => e.preventDefault()} >
+          <Form.Select className = "me-3" style={{width: '110px'}} aria-label="Default select example" value={searchType} onChange={handleTypeChange}>
+            <option value="podcast">Podcast</option>
+            <option value="episode">Episode</option>
+          </Form.Select>
 
-        <Form.Select className = "me-3" style={{width: '110px'}} aria-label="Default select example" value={searchType} onChange={handleTypeChange}>
-          <option value="podcast">Podcast</option>
-          <option value="episode">Episode</option>
-        </Form.Select>
-
-        <Form.Control
-          type="search"
-          placeholder="Search"
-          className="me-2"
-          aria-label="Search"
-          value={searchQuery}
-          onChange={handleSearchChange}
-        />
-
-        <Button variant="outline-light" onClick={fetchPodcasts}>Search</Button>
+          <Form.Control
+            type="search"
+            placeholder="Search"
+            className="me-2"
+            aria-label="Search"
+            value={searchQuery}
+            onChange={handleSearchChange}
+          />
+          <Button variant="outline-light" onClick={fetchPodcasts}>Search</Button>
         </Form>
         <div>
           {hasSearched ? (
@@ -177,14 +201,26 @@ useEffect(() => {
                 {isLoading ? (
                   <div>Loading...</div>
                 ) : (
-                  podcasts.map((podcast, index) => (
-                    <div key={index} className="podcast-item">
-                      <Image src={podcast.image} alt="podcast thumbnail" />
-                      <Button variant="primary" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
-                      <h5>{podcast.title_original}</h5>
-                      <p>{podcast.description_highlighted}</p>
-                    </div>
-                  ))
+                  <Container>
+                    <Row> 
+                      <Col className="text-center my-4">
+                        <h1 style={{ fontSize: '3rem' }}>Explore Podcasts</h1>
+                      </Col>
+                    </Row>
+                    <Row>
+                      {podcasts.map((podcast, index) => (
+                        <Col xs={12} md={6} lg={4} xxl={3} key={index} className="mb-3 d-flex justify-content-center">
+                          <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3">
+                            <Image src={podcast.image} alt="podcast thumbnail" />
+                            <h5>Podcast: {podcast.title_original}</h5>
+                            <p>{podcast.description_highlighted}</p>
+                            <Button variant="primary" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
+                            <Button variant="primary" onClick={() => handleReview(podcast)}>Review Podcast</Button>
+                          </Card>
+                        </Col>
+                      ))}
+                    </Row>
+                  </Container>
                 )}
               </Container>
             ) : lastSearchType === 'episode' ? (
@@ -192,14 +228,27 @@ useEffect(() => {
                 {isLoading ? (
                   <div>Loading...</div>
                 ) : (
-                  podcasts.map((episode, index) => (
-                    <div key={index} className="episode-item">
-                      <Image src={episode.image} alt="episode thumbnail" />
-                      <Button variant="primary" onClick={() => handleCurrentEpisode(episode)}>Play Episode</Button>
-                      <h5>{episode.title_original}</h5>
-                      <p>{episode.description_highlighted}</p>
-                    </div>
-                  ))
+                  <Container>
+                    <Row>
+                      <Col className="text-center my-4">
+                        <h1 style={{ fontSize: '3rem' }}>Explore Episodes</h1>
+                      </Col>
+                    </Row>
+                    <Row>
+                      {podcasts.map((episode, index) => (
+                          <Col xs={12} md={6} lg={4} xxl={3} key={index} className="mb-3 d-flex justify-content-center">
+                            <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3">
+                              <Image src={episode.image} alt="episode thumbnail" />
+                              <h5>Episode: {episode.title_original}</h5>
+                              <p>{episode.description_highlighted}</p>
+                              <Button variant="primary" onClick={() => handleCurrentEpisode(episode)}>Play Episode</Button>
+                              <Button variant="primary" onClick={() => handleReview(episode)}>Review Episode</Button>
+
+                            </Card>
+                          </Col>
+                        ))}
+                      </Row>
+                  </Container>
                 )}
               </Container>
             ) : null
@@ -208,16 +257,27 @@ useEffect(() => {
               {error ? (
                 <div>Error: {error}</div>
               ) : podcasts.length > 0 ? (
-                podcasts.map((podcast, index) => (
-                  <div key={index} className="review-box bg-light p-3 mb-3">
-                    <img src={podcast.image} alt="Podcast Cover" className="img-thumbnail mb-3" />
-                    <h5 className="card-title">Podcast: {podcast.title}</h5>
-                    <p className="card-text">Language: {podcast.language}</p>
-                    <p className="card-text">{podcast.description.length > 100 ? podcast.description.substring(0,100) + '...' : podcast.description} </p>
-                    <Button variant="primary" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
-                  </div>
-                  
-                ))
+                <Container>
+                  <Row> 
+                    <Col className="text-center my-4">
+                      <h1 style={{ fontSize: '3rem' }}>Explore the Best Podcasts of the Week</h1>
+                    </Col>
+                  </Row>
+                  <Row>
+                    {podcasts.map((podcast, index) => (
+                        <Col xs={12} md={6} lg={4} xxl={3} key={index} className="mb-3 d-flex justify-content-center">
+                          <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3">
+                            <img src={podcast.image} alt="Podcast Cover" className="img-thumbnail mb-3" />
+                            <h5>Podcast: {podcast.title}</h5>
+                            <p>Language: {podcast.language}</p>
+                            <p>{podcast.description.length > 100 ? podcast.description.substring(0,100) + '...' : podcast.description} </p>
+                            <Button variant="primary" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
+                            <Button variant="primary" onClick={() => handleReview(podcast)}>Review Podcast</Button>
+                          </Card>
+                        </Col>
+                    ))}
+                  </Row>
+                </Container>
               ) : (
                 <div>No reviews found</div>
               )}
