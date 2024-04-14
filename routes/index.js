@@ -117,6 +117,11 @@ router.post('/login', async (req, res) => {
             return res.status(404).json({ error: "User not found" });
         }
 
+        // Check if the user is verified
+        if (!user.verified) {
+            return res.status(401).json({ error: "User not verified" });
+        }
+
         // Check if the password matches
         //compare with hashed password
         const isMatched = await bcrypt.compareSync(Password, user.Password);
