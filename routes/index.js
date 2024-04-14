@@ -10,8 +10,10 @@ const client = new MongoClient(url);
 client.connect(console.log("mongodb connected"));
 
 const jwt = require('jsonwebtoken');
-const { generateOTP, mailTransport, generateEmailTemplate, plainEmailTemplate } = require('../mail');
+const { generateOTP, mailTransport, generateEmailTemplate, plainEmailTemplate, generatePasswordResetTemplate, resetSuccessfullTemplate } = require('../utils/mail');
 const { ObjectId } = require('mongodb');
+const { createRandomBytes } = require('../utils/helper');
+const { isResetTokenValid } = require('../middlewares/user');
 
 // API for registering a new user
 router.post('/register', validateUser, validate, async (req, res) => {
@@ -181,6 +183,97 @@ router.post('/verifyEmail', async (req, res) => {
         console.error("Error registering user:", error);
         res.status(500).json({ error: "An error occurred while verifying user" });
     }
+});
+
+router.post('/forgotPassword', async (req, res) => {
+
+    const { Email } = req.body;
+
+    if (!Email) {
+        return res.status(400).json({ error: "Please provide a valid email" });
+    }
+
+    await client.connect();
+    const db = client.db("Podcast");
+    const collection = db.collection('User');
+    const user = await collection.findOne({ Email: Email });
+
+    if (!user) {
+        return res.status(400).json({ error: "User not found" });
+    }
+
+    const token = await db.collection('ResetTokens').findOne({owner: user._id});
+    if (token) {
+        return res.status(400).json({ error: "For security reasons, you must wait 1 hour for a new link" });
+    }
+
+   const ranbytes = await createRandomBytes();
+   const resetToken = {
+        owner: user._id,
+        token: ranbytes,
+        createdAt : new Date(),
+        expiresAt : new Date(Date.now() + 3600000),
+   }
+
+   await db.collection('ResetTokens').insertOne(resetToken);
+
+   mailTransport().sendMail({
+        from: 'security@email.com',
+        to: user.Email,
+        subject: "Password Reset",
+        html: generatePasswordResetTemplate(`http://localhost:3000/resetPassword?token=${ranbytes}&id=${user._id}`),
+    });
+
+    res.json({success: true, message: 'Password reset link is sent to your email.'});
+
+});
+
+router.post('/resetPassword', isResetTokenValid, async(req, res) => {
+
+    //uses function in middleware folder user.js
+    //get password from req.body from middleware 
+    const { Password } = req.body;
+
+    await client.connect();
+    const db = client.db("Podcast");
+    const collection = db.collection('User');
+    
+    //find that user
+    const user = await collection.findOne({_id: req.user._id});
+    if (!user) {
+        return res.status(400).json({ error: "User not found" });
+    }
+
+
+    const isMatched = await bcrypt.compareSync(Password, user.Password);
+    if (isMatched) {
+        return res.status(401).json({ error: "New password must be different" });
+    }
+
+    //recheck password parameters, only adding length for placeholder API change later----------------------------
+    if (Password.trim().length < 8 ) {
+        return res.status(401).json({error: "Password must be over 8 characters"});
+    }
+
+    //update password and hash
+    const hashPassword = await bcrypt.hash(Password, 8);
+    user.Password = hashPassword;
+
+    await collection.findOneAndUpdate({_id: user._id},{$set: {Password: user.Password}});
+    
+    //delete reset token after using
+    await db.collection('ResetTokens').findOneAndDelete({owner: user._id});
+
+    mailTransport().sendMail({
+        from: 'security@email.com',
+        to: user.Email,
+        subject: "Password Reset Successfully",
+        html: resetSuccessfullTemplate(),
+    });
+
+    res.json({success: true, message: 'Password was successfully reset.'});
+
+
 });
 
 
