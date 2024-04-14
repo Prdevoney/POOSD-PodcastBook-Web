@@ -50,6 +50,7 @@ Link for the live website: [podcastd-test.azurewebsites.net](https://podcastd-te
   * The request is processed by the app.js file in the main directory
   * From there it routes the request to the proper file and endpoint in the 'routes' folder
   * Link for the podcast API: https://www.listennotes.com/api/docs/
+  * Link for PodcastBook API documentation: https://app.swaggerhub.com/apis/AdrianHernandez2/PodcastBookAPI/1.0.0
  
  
   
