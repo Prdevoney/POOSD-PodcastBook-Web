@@ -1,5 +1,5 @@
 import React, {useState} from 'react'
-import './LoginSignupPage.css'
+import './LoginSignupStyle.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const LoginSignup = () => {

@@ -11,7 +11,7 @@ import Modal from 'react-bootstrap/Modal';
 import Card from 'react-bootstrap/Card';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import './ExplorePage.css';
+import './ExplorePageStyle.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const { Client } = require('podcast-api');
