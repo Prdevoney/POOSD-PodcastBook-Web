@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 const { validateUser, validate } = require('../middlewares/validator');
+const verifyToken = require('../middlewares/verification');
 const bcrypt = require('bcrypt');
 
 const url = 'mongodb+srv://apitest:apitest@cluster0.6ssywfd.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
@@ -116,6 +117,11 @@ router.post('/login', async (req, res) => {
             return res.status(404).json({ error: "User not found" });
         }
 
+        // Check if the user is verified
+        if (!user.verified) {
+            return res.status(401).json({ error: "User not verified" });
+        }
+
         // Check if the password matches
         //compare with hashed password
         const isMatched = await bcrypt.compareSync(Password, user.Password);
@@ -191,7 +197,7 @@ router.post('/verifyEmail', async (req, res) => {
     }
 });
 
-router.put('/updatePassword', async (req, res) => {
+router.put('/updatePassword', verifyToken, async (req, res) => {
     try {
         const { id, Password } = req.body;
 
@@ -233,7 +239,7 @@ router.put('/updatePassword', async (req, res) => {
     }
 });
 
-router.delete('/deleteUser', async (req, res) => {
+router.delete('/deleteUser', verifyToken, async (req, res) => {
     try {
         const { id } = req.body;
 
@@ -266,7 +272,7 @@ router.delete('/deleteUser', async (req, res) => {
 
 
 // Endpoint for toggling follow/unfollow status between a user and a target user.
-router.post('/followUnfollowToggle', async (req, res) => {
+router.post('/followUnfollowToggle', verifyToken, async (req, res) => {
     try {
         // Extract UserID and targetUserID from the request body
         const { UserID, targetUserID } = req.body;
@@ -338,7 +344,7 @@ router.post('/followUnfollowToggle', async (req, res) => {
 });
 
 // Endpoint for retrieving a users followers with pagination
-router.post('/getFollowers', async (req, res) => {
+router.post('/getFollowers', verifyToken, async (req, res) => {
     try {
         const { UserID, page = 1, limit = 10 } = req.body; // Default to page 1 and limit 10 if not provided
 
@@ -379,7 +385,7 @@ router.post('/getFollowers', async (req, res) => {
 });
 
 // Endpoint for retrieving users whom the specified user is following with pagination
-router.post('/getFollowing', async (req, res) => {
+router.post('/getFollowing', verifyToken, async (req, res) => {
     try {
         const { UserID, page = 1, limit = 10 } = req.body; // Default to page 1 and limit 10 if not provided
 
@@ -419,7 +425,13 @@ router.post('/getFollowing', async (req, res) => {
     }
 });
 
-router.post('/FollowUser', async (req, res) => {
+  // followuser[My UserID, The TargetID i want to follow]
+  // If MyUserID = 65ef7003e62b8bf051c994c6
+  // MyTargetID = 65efa246e62b8bf051c994c7
+  // I.E FollowUser[MyUserID, MyTargetID]
+  // follows the user by adding them from the users following array and to the targets followed array
+
+router.post('/FollowUser', verifyToken, async (req, res) => {
     try {
       const { UserID, targetUserID } = req.body;
   
@@ -445,7 +457,7 @@ router.post('/FollowUser', async (req, res) => {
 
       collection.updateOne({_id: new ObjectId(UserID)}, { $push: { Following: new ObjectId(targetUserID)}});
 
-      collection.updateOne({_id: new ObjectId(targetUserID)}, { $push: { Following: new ObjectId(UserID)}});
+      collection.updateOne({_id: new ObjectId(targetUserID)}, { $push: { Followers: new ObjectId(UserID)}});
 
       // Respond with success message
       res.status(201).json({ message: "Follow added successfully", user });
@@ -455,17 +467,59 @@ router.post('/FollowUser', async (req, res) => {
     }
   });
 
-router.post('/SearchUser', async (req, res) => {
+  // Unfollowuser[My UserID, The TargetID i want to unfollow]
+  // If MyUserID = 65ef7003e62b8bf051c994c6
+  // MyTargetID = 65efa246e62b8bf051c994c7
+  // I.E UnFollowUser[MyUserID, MyTargetID]
+  // Unfollows the user by removing them from the users following array and from the targets followed array
+
+  router.post('/UnFollowUser', verifyToken, async (req, res) => {
+    try {
+      const { UserID, targetUserID } = req.body;
+  
+      // Check for required fields
+      if ( !UserID || !targetUserID) {
+        return res.status(400).json({ error: "All fields are required" });
+      }
+  
+      
+      await client.connect();
+  
+      const db = client.db("Podcast");
+      const collection = db.collection('User');
+
+
+      const user = await collection.findOne({ _id: new ObjectId(UserID) });
+
+      const targetuser = await collection.findOne({ _id: new ObjectId(targetUserID) });
+
+      console.log("Searching for user", user);
+
+      console.log("Searching for target user", targetuser);
+
+      collection.updateOne({_id: new ObjectId(UserID)}, { $pull: { Following: new ObjectId(targetUserID)}});
+
+      collection.updateOne({_id: new ObjectId(targetUserID)}, { $pull: { Followers: new ObjectId(UserID)}});
+
+      // Respond with success message
+      res.status(201).json({ message: "Unfollow successfully", user });
+    } catch (error) {
+      console.error("Error Following user:", error);
+      res.status(500).json({ error: "An error occurred while Following user" });
+    }
+  });
+
+router.post('/SearchUser', verifyToken, async (req, res) => {
     try {
         // Extract username and password from request body
-        const {Username} = req.body;
+        const {MyUser, Username} = req.body;
         console.log("Searching for user", Username);
         await client.connect();
 
         const db = client.db("Podcast");
         const collection = db.collection('User');
 
-        const users = await collection.find({ Username: {$regex: new RegExp(Username, 'i')} }).toArray();
+        const users = await collection.find({ Username: {$ne: MyUser, $regex: new RegExp(Username, 'i')}}).toArray();
 
         // const results = await db.collection('Cards').find({"Card":{$regex:_search+'.*', $options:'r'}}).toArray();
 
@@ -480,5 +534,37 @@ router.post('/SearchUser', async (req, res) => {
         res.status(500).json({ error: "An error occurred could not find user should not reach here hopefully" });
     }
 });
+
+router.post('/getUserInfo', verifyToken, async (req, res) => {
+    try {
+        // Extract UserID from request body
+        const { UserID } = req.body;
+
+        // Connect to the MongoDB client
+        await client.connect();
+
+        // Get reference to the MongoDB database and the 'User' collection
+        const db = client.db("Podcast");
+        const collection = db.collection('User');
+
+        // Find the user by UserID
+        const user = await collection.findOne({ _id: new ObjectId(UserID) });
+
+        // If user not found, return 404 error
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+
+        // If user found, return user information
+        res.status(200).json({ user });
+
+    } catch (error) {
+        // Handle any errors that occur during the process
+        console.error("Error fetching user info:", error);
+        res.status(500).json({ error: "An error occurred while fetching user info" });
+    }
+});
+
+
 
 module.exports = router;
