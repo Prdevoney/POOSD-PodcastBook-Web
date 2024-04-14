@@ -5,7 +5,6 @@
     "scripts": {
         "start": "node ./bin/www",
         "dev": "nodemon ./bin/www",
-        "test": "jest --runInBand --forceExit --detectOpenHandles",
         "build": "cd client && npm install && npm run build",
         "postinstall": "npm run build",
         "test:watch": "npm run test -- --watch"
