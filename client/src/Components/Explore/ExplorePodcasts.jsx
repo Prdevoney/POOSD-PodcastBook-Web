@@ -60,7 +60,7 @@ const ExplorePodcasts =() =>{
     const normalizedData = {
       title: data.title_original || data.title,
       image: data.image,
-      description: data.description_original || data.description,
+      description: data.description || data.description_highlighted,
       id: data.id,
       type: data.audio ? 'episode' : 'podcast',
     }
@@ -213,9 +213,9 @@ useEffect(() => {
                           <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3">
                             <Image src={podcast.image} alt="podcast thumbnail" />
                             <h5>Podcast: {podcast.title_original}</h5>
-                            <p>{podcast.description_highlighted}</p>
-                            <Button variant="primary" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
-                            <Button variant="primary" onClick={() => handleReview(podcast)}>Review Podcast</Button>
+                            <p dangerouslySetInnerHTML={{ __html: podcast.description_highlighted.length > 150 ? podcast.description_highlighted.substring(0, 150) + '...' : podcast.description_highlighted }}></p>
+                            <Button variant="outline-primary" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
+                            <Button className="mt-2" variant="primary" onClick={() => handleReview(podcast)}>Review Podcast</Button>
                           </Card>
                         </Col>
                       ))}
@@ -240,9 +240,9 @@ useEffect(() => {
                             <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3">
                               <Image src={episode.image} alt="episode thumbnail" />
                               <h5>Episode: {episode.title_original}</h5>
-                              <p>{episode.description_highlighted}</p>
-                              <Button variant="primary" onClick={() => handleCurrentEpisode(episode)}>Play Episode</Button>
-                              <Button variant="primary" onClick={() => handleReview(episode)}>Review Episode</Button>
+                              <p dangerouslySetInnerHTML={{ __html: episode.description_highlighted.length > 150 ? episode.description_highlighted.substring(0, 150) + '...' : episode.description_highlighted }}></p>
+                              <Button variant="outline-primary" onClick={() => handleCurrentEpisode(episode)}>Play Episode</Button>
+                              <Button className="mt-2" variant="primary" onClick={() => handleReview(episode)}>Review Episode</Button>
 
                             </Card>
                           </Col>
@@ -270,9 +270,9 @@ useEffect(() => {
                             <img src={podcast.image} alt="Podcast Cover" className="img-thumbnail mb-3" />
                             <h5>Podcast: {podcast.title}</h5>
                             <p>Language: {podcast.language}</p>
-                            <p>{podcast.description.length > 100 ? podcast.description.substring(0,100) + '...' : podcast.description} </p>
-                            <Button variant="primary" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
-                            <Button variant="primary" onClick={() => handleReview(podcast)}>Review Podcast</Button>
+                            <p dangerouslySetInnerHTML={{ __html: podcast.description.length > 150 ? podcast.description.substring(0, 150) + '...' : podcast.description }}></p>
+                            <Button variant="outline-primary" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
+                            <Button className="mt-2" variant="primary" onClick={() => handleReview(podcast)}>Review this Podcast</Button>
                           </Card>
                         </Col>
                     ))}
