@@ -68,6 +68,7 @@ function Main() {
                 <Nav.Link as={NavLink} to="/account" style={{ textDecoration: location.pathname === '/account' ? 'underline' : 'none', color: location.pathname === '/account' ? 'white' : 'inherit' }}>Account</Nav.Link>
               </Nav>
               
+{/*     Just commented out the search bar for now.
 
             {location.pathname !== '/review-podcast' && (
               <>
@@ -87,7 +88,7 @@ function Main() {
                 <Button variant="outline-light">Search</Button>
               </Form>
               </>
-              )}
+              )} */}
 
             </Navbar.Collapse>
           </Container>

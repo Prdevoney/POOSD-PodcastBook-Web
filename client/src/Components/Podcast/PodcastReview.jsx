@@ -1,5 +1,6 @@
 import React from 'react';
 import {useState } from 'react';
+import {useLocation} from 'react-router-dom';
 import {FaStar} from 'react-icons/fa';
 import { Button, Container, Modal, Form } from 'react-bootstrap';
 import Image from 'react-bootstrap/Image';
@@ -8,6 +9,9 @@ import Col from 'react-bootstrap/Col';
 import './PodcastReviewStyle.css';
 
 function PodcastReview() {
+    const location = useLocation();
+    const { reviewData } = location.state || {};
+
     const [rating, setRating] = useState(null);
     const [hover, setHover] = useState(null);
     const [show, setShow] = useState(false);
@@ -40,7 +44,8 @@ function PodcastReview() {
                     <Col>
                         <Row>
                             <Col>
-                            <h1>Insert Podcast Title here</h1>
+                            <h1>{reviewData.title}</h1>
+                            <p>{reviewData.description}</p>
                             </Col>
                             <Col sm={3} className ='ml-auto'>
                               <Button variant="primary" onClick={handleShow}>Add Review</Button>

@@ -2,8 +2,6 @@ import React, {useState, useEffect} from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
@@ -52,7 +50,7 @@ const ExplorePodcasts =() =>{
 
   const handleReview = (data) => {
     const dataForReview = normalizeData(data);
-    navigate('/review', {state: {reviewData: dataForReview}});
+    navigate('/review-podcast', {state: {reviewData: dataForReview}});
   };
 
   const normalizeData = (data) => {
@@ -143,21 +141,7 @@ const ExplorePodcasts =() =>{
 
   return (
     <div> {/* Wrap the elements inside a parent div */}
-      <Navbar expand="sm" className="navbar-container" /*bg="primary" data-bs-theme="dark"*/  >
-        <Container fluid >
-          <Navbar.Brand href="#">Podcast Book</Navbar.Brand>
-          <Navbar.Toggle aria-controls="navbarScroll" style={{ height: '50px' }}/>
-          <Navbar.Collapse id="navbarScroll" >
-            <Nav className="me-auto my-2 my-lg-0" style={{ maxHeight: '100px' }} navbarScroll>
-              <Nav.Link href="#action1">Explore</Nav.Link>
-              <Nav.Link href="#action2">Account</Nav.Link>
-            </Nav>
-           
-            
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
-
+      
       <Modal show={showModal} onHide={() => {setShowModal(false); setCurrentEpisode(null);}} centered>
         <Modal.Header closeButton>
           <Modal.Title>{currentEpisode ? currentEpisode.title : 'Loading...'}</Modal.Title>
