@@ -9,6 +9,8 @@ app.use(router);
 
 const agent = supertest.agent(app);
 
+// To run this script, navigate to the 'tests' directory in your terminal and run the following command: 'npm test'
+
 describe("Testing /login", () => {
     it("Should return a status 200 and provide a JWT token upon successful login", async () => {
         const username = 'testy';
