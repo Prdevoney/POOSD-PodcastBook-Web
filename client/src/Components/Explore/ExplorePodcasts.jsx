@@ -33,7 +33,7 @@ const ExplorePodcasts =() =>{
   const [currentEpisode, setCurrentEpisode] = useState(null);
   const [showModal, setShowModal] = useState(false);
 
-  
+
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -141,29 +141,54 @@ const ExplorePodcasts =() =>{
   },[]);
 
   return (
-    <div> {/* Wrap the elements inside a parent div */}
+    <div> 
       
       <Modal show={showModal} onHide={() => {setShowModal(false); setCurrentEpisode(null);}} centered>
         <Modal.Header closeButton>
-          <Modal.Title>{currentEpisode ? currentEpisode.title : 'Loading...'}</Modal.Title>
+          <Modal.Title>{currentEpisode ? currentEpisode.title || currentEpisode.title_original: 'Loading...'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {currentEpisode ? (
-          <audio controls autoPlay>
-            <source src={currentEpisode.audio} type="audio/mpeg" />
-            Your browser does not support the audio element.
-          </audio>
+          <div>
+            <audio controls autoPlay>
+              <source src={currentEpisode.audio} type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
+            <p dangerouslySetInnerHTML={{ __html: currentEpisode.description || currentEpisode.description_highlighted }}></p>
+            <Button className="mt-2" variant="primary" onClick={() => handleReview(currentEpisode)}>Review Episode</Button>
+
+          </div>
           ) : (
             <p>Loading...</p>
           )}
         </Modal.Body>
       </Modal>
 
+      <Container fluid style={{ padding: 0 }}>
+        <Row>
+          <Col>
+            <div style={{
+              backgroundImage: 'url(/HeroSectionExtension.webp)', 
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              height: '75vh', 
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+            </div>
+          </Col>
+        </Row>
+      </Container>
 
       <Container>
+        <Row className="text-center mt-5 mb-3">
+          <h1 className="bebas-neue-regular" style={{ fontSize: '4rem' }}>Discover, listen to, & review new podcasts and episodes</h1>
+        </Row>
 
-        <Form className="d-flex my-4" onSubmit={(e) => e.preventDefault()} >
-          <Form.Select className = "me-3" style={{width: '110px'}} aria-label="Default select example" value={searchType} onChange={handleTypeChange}>
+        <Form className="d-flex mb-4" onSubmit={(e) => e.preventDefault()} >
+          
+          <Form.Select className = "me-3" variant="primary" style={{width: '110px'}} aria-label="Default select example" value={searchType} onChange={handleTypeChange}>
             <option value="podcast">Podcast</option>
             <option value="episode">Episode</option>
           </Form.Select>
@@ -178,6 +203,7 @@ const ExplorePodcasts =() =>{
           />
           <Button variant="outline-light" onClick={fetchPodcasts}>Search</Button>
         </Form>
+        <hr className="custom-hr" />
         <div>
           {hasSearched ? (
             lastSearchType === 'podcast' ? (
@@ -188,7 +214,7 @@ const ExplorePodcasts =() =>{
                   <Container>
                     <Row> 
                       <Col className="text-center my-4">
-                        <h1 style={{ fontSize: '3rem' }}>Explore Podcasts</h1>
+                        <h1 className="bebas-neue-regular" style={{ fontSize: '3rem' }}>Explore Podcasts</h1>
                       </Col>
                     </Row>
                     <Row>
@@ -215,7 +241,7 @@ const ExplorePodcasts =() =>{
                   <Container>
                     <Row>
                       <Col className="text-center my-4">
-                        <h1 style={{ fontSize: '3rem' }}>Explore Episodes</h1>
+                        <h1 className="bebas-neue-regular" style={{ fontSize: '3rem' }}>Explore Episodes</h1>
                       </Col>
                     </Row>
                     <Row>
@@ -224,7 +250,7 @@ const ExplorePodcasts =() =>{
                             <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3">
                               <Image src={episode.image} alt="episode thumbnail" />
                               <h5>Episode: {episode.title_original}</h5>
-                              <p dangerouslySetInnerHTML={{ __html: episode.description_highlighted.length > 150 ? episode.description_highlighted.substring(0, 150) + '...' : episode.description_highlighted }}></p>
+                              <p dangerouslySetInnerHTML={{ __html: episode.description_highlighted.length > 150 ? episode.description_highlighted.substring(0, 150) + '...': episode.description_highlighted }}></p>
                               <Button variant="outline-primary" onClick={() => handleCurrentEpisode(episode)}>Play Episode</Button>
                               <Button className="mt-2" variant="primary" onClick={() => handleReview(episode)}>Review Episode</Button>
 
@@ -244,7 +270,7 @@ const ExplorePodcasts =() =>{
                 <Container>
                   <Row> 
                     <Col className="text-center my-4">
-                      <h1 style={{ fontSize: '3rem' }}>Explore the Best Podcasts of the Week</h1>
+                      <h1 className="bebas-neue-regular" style={{ fontSize: '3rem' }}>Explore the Best Podcasts of the Week</h1>
                     </Col>
                   </Row>
                   <Row>
