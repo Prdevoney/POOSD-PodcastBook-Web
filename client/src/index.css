@@ -10,6 +10,10 @@ body {
   /* rgb(62, 131, 196) */
 }
 
+.navbar-container {
+  min-height: 80px; /* Replace with the height you want */
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
