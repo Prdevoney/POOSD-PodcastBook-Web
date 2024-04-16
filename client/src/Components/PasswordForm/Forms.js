@@ -6,7 +6,7 @@ import axios from "axios";
 import './Forms.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const baseurl = 'https://podcastd-test.azurewebsites.net'
+const baseurl = 'https://podcastd-test.azurewebsites.net/api'
 
 export default function Form() {
 
