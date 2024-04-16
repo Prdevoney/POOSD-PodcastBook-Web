@@ -6,9 +6,8 @@
         "start": "node ./bin/www",
         "dev": "nodemon ./bin/www",
         "build": "cd client && npm install && npm run build",
-        "postinstall": "npm run build",
+        "postinstall": "npm run build"
    
-        "test:watch": "npm run test -- --watch"
     },
     "jest": {
         "testEnvironment": "node"
