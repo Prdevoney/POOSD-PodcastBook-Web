@@ -1,16 +1,17 @@
 import React, {useState} from 'react'
+import { useNavigate } from 'react-router-dom';
+
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
 import Modal from 'react-bootstrap/Modal'
 import './LoginSignupStyle.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { set } from 'mongoose'
 
 const LoginSignup = () => {
 
-    const [action,setAction] = useState("Login");
+    const navigate = useNavigate();
 
-    // new info ---> 
+    const [action,setAction] = useState("Login");
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -68,6 +69,7 @@ const LoginSignup = () => {
       }
     };
   
+    // 1) This is the function that handles the login
     const handleLogin = async () => {
       try {
         // Send login data to backend
@@ -77,16 +79,20 @@ const LoginSignup = () => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
+            // 2) I send the username and password to the server
             "Username": username,
             "Password": password
           })
         });
-  
+        
+        // 3) I get the response from the server and set it in the 'data' variable
+        //    Within this response is the UserID that you may need to pass through to use on other pages. 
         const data = await response.json();
+
         if (response.ok) {
-          console.log(data); // Handle response from the server as needed
-          
-          // Redirect to Explore Podcasts page upon successful login
+
+          // 4) Redirect to Explore Podcasts page upon successful login and log the data
+          console.log(data); 
           window.location.href = '/explore-podcasts';
         } else {
           throw new Error(data.error || "Login failed");
@@ -98,6 +104,7 @@ const LoginSignup = () => {
       }
     };
 
+    // 1) Once type in the verification code that was sent to your email
     const verifyCode = async () => {
       try {
         const response = await fetch('/api/verifyEmail', {
@@ -106,13 +113,17 @@ const LoginSignup = () => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
+            // 2) the I got the UserID from the response of the signup API in the function handleSignup
             "UserID": userInfo.UserID,
             "otp": otp,
           })
         });
-  
+        
+        // 3) I get the response from the server and set it in the 'data' variable
         const data = await response.json();
+
         if (response.ok) {
+          // 4) If the response is ok, I log the data and redirect to the Explore Podcasts page
           console.log(data);
           window.location.href = '/explore-podcasts';
         } else {
