@@ -1,5 +1,4 @@
 import React, {useState} from 'react'
-import { useNavigate } from 'react-router-dom';
 
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
@@ -9,7 +8,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const LoginSignup = () => {
 
-    const navigate = useNavigate();
 
     const [action,setAction] = useState("Login");
     const [email, setEmail] = useState("");
