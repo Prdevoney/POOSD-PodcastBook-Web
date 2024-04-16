@@ -69,7 +69,7 @@ export default function Form() {
             //console.log(data);
             
             if (data.success) {
-                navigate('/reset-password');
+                navigate('/resetPassword');
                 setSuccess(true);
             }
         } catch (error) {
