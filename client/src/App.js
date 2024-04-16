@@ -1,7 +1,7 @@
 import './App.css';
 import LoginSignup from './Components/LoginSignup/LoginSignup.jsx';
 import ExplorePodcasts from './Components/Explore/ExplorePodcasts.jsx';
-import Form from './Components/PasswordForm/Forms.js';
+import Form from './Components/PasswordForm/Forms';
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom';

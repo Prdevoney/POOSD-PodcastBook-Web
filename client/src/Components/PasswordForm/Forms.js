@@ -88,7 +88,7 @@ export default function Form() {
     </div>
 
 
-    if (!invalidUser) return <div className="max-w-screen-sm m-auto pt-40">
+    if (invalidUser) return <div className="max-w-screen-sm m-auto pt-40">
         <h1 className="text-center text-3xl text-gray-500 mb-3">{invalidUser}</h1>
     </div>
 

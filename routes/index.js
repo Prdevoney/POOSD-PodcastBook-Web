@@ -633,7 +633,7 @@ router.post('/SearchUser', async (req, res) => {
     }
 });
 
-router.post('/getUserInfo', verifyToken, async (req, res) => {
+router.post('/getUserInfo', async (req, res) => {
     try {
         // Extract UserID from request body
         const { UserID } = req.body;
