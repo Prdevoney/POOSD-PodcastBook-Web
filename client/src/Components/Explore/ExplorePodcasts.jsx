@@ -1,72 +1,120 @@
 import React, {useState, useEffect} from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import Container from 'react-bootstrap/Container';
-import Nav from 'react-bootstrap/Nav';
-import Navbar from 'react-bootstrap/Navbar';
-// import NavDropdown from 'react-bootstrap/NavDropdown';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Image from 'react-bootstrap/Image';
-import './ExplorePage.css';
+import Modal from 'react-bootstrap/Modal';
+import Card from 'react-bootstrap/Card';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
+import './ExplorePageStyle.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const { Client } = require('podcast-api');
 
+/* Use for deployment */
+const API_KEY = process.env.LISTEN_NOTES_KEY;
 
-// const ReviewBox = ({ podcast, reviewText, rating }) => {
-//     return (
-//       <div className="review-box bg-light p-3 mb-3">
-//         <h5 className="card-title">Podcast: {podcast}</h5>
-//         <p className="card-text">{reviewText.length > 100 ? reviewText.substring(0, 100) + '...' : reviewText}</p>
-//         <p className="card-text">Rating: {rating}</p>
-//       </div>
-//     );
-//   };
+/* use for actuall data*/
+// const API_KEY = 'fbc6a6fd278f4f91a42b56cbd0f911f0';
 
-const PodcastBox = ({ title, language, image, description }) => {
-    return (
-      <div className="review-box bg-light p-3 mb-3">
-        <img src={image} alt="Podcast Cover" className="img-thumbnail mb-3" />
-        <h5 className="card-title">Podcast: {title}</h5>
-        <p className="card-text">Language: {language}</p>
-        <p className="card-text">{description.length > 100 ? description.substring(0,100) + '...' : description} </p>
-      </div>
-    );
-  };
-
-
+/* use for testing */
+// const API_KEY = '';
 
 const ExplorePodcasts =() =>{
-
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchType, setSearchType] = useState('podcast');
+  const [lastSearchType, setLastSearchType] = useState('podcast');
   const [podcasts, setPodcasts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState('');
-  // const [reviews, setReviews] = useState([]);
-  // const [searchType, setSearchType] = useState('Podcast');
-  // const [searchInput, setSearchInput] = useState('');
+
+  const [currentEpisode, setCurrentEpisode] = useState(null);
+  const [showModal, setShowModal] = useState(false);
 
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
 
+  const handleTypeChange = (e) => {
+    setSearchType(e.target.value);
+  };
+
+  const handleCurrentEpisode = (currEpisode) => {
+     console.log("Episode data received:", currEpisode);
+
+      setCurrentEpisode(currEpisode);
+      setShowModal(true);
+  };
+
+  const handleReview = (data) => {
+    const dataForReview = normalizeData(data);
+    navigate('/review-podcast', {state: {reviewData: dataForReview}});
+  };
+
+  const normalizeData = (data) => {
+    const normalizedData = {
+      title: data.title_original || data.title,
+      image: data.image,
+      description: data.description || data.description_highlighted,
+      id: data.id,
+      type: data.audio ? 'episode' : 'podcast',
+    }
+
+    if (data.audio) {
+      normalizedData.audio = data.audio;
+    } else {
+      normalizedData.episodeCount = data.total_episodes;
+    }
+    return normalizedData;
+  };
+
+  const getEpisode = async (podcastId) => {
+
+    const client = Client({ apiKey: API_KEY });
+    try{
+      const response = await client.fetchPodcastById({
+        id: podcastId,
+        sort: 'recent_first',
+      });
+
+      console.log('Episodes:', response.data.episodes);
+      handleCurrentEpisode(response.data.episodes[0]);
+
+    } catch(error){
+      console.error('Error fetching podcasts:', error);
+    }
+  };
+
   const fetchPodcasts = async () => {
     setIsLoading(true);
     setHasSearched(true);
-    const client = Client({ apiKey: '' });
+
+    if (!searchQuery.trim()){
+      console.error('Error: Search query cannot be empty');
+      setIsLoading(false); 
+      setHasSearched(false);
+      return; 
+    }
+
+    const client = Client({ apiKey: API_KEY });
     try {
       // Use the search method from the client
       const response = await client.search({
         q: searchQuery,
-        type: 'podcast', 
+        type: searchType, 
         language: 'English',
         region: 'us'
       });
 
-      console.log('Podcasts:', response.data.results);
-      // Set the search results. Adjust according to the actual response structure.
+      console.log('Podcasts/Episodes:', response.data.results);
       setPodcasts(response.data.results);
+      setLastSearchType(searchType);
     } catch (error) {
       console.error('Error fetching podcasts:', error);
     } finally {
@@ -74,116 +122,201 @@ const ExplorePodcasts =() =>{
     }
   };
 
-useEffect(() => {
- const fetchInitialPodcasts = async () => {
-        const client = Client({ apiKey: '' });
-        try {
-              client.fetchBestPodcasts({
-              region: 'us',
-              sort: 'listen_score',
-              safe_mode: 0,
-            
-            }).then((response) => {
+  useEffect(() => {
+    const fetchInitialPodcasts = async () => {
+          const client = Client({ apiKey: API_KEY });
+          try {
+                client.fetchBestPodcasts({
+                region: 'us',
+                sort: 'listen_score',
+                safe_mode: 0,
+              
+              }).then((response) => {
 
-              setPodcasts(response.data.podcasts);
-              console.log(podcasts);
+                setPodcasts(response.data.podcasts);
 
-            }).catch((error) => {
+                console.log('Best Podcasts:', response.data.podcasts);
+              }).catch((error) => {
 
-              console.log(error)
+                console.log(error)
 
-            });
+              });
 
-        } catch (error) { //Probably redundant, but didn't want to mess anything up
-            console.error('Error fetching reviews:', error);
-            setError('Error fetching reviews');
-        }
-    };
+          } catch (error) { 
+              console.error('Error fetching reviews:', error);
+              setError('Error fetching reviews');
+          }
+      };
 
-    fetchInitialPodcasts();
-  },);
-
+      fetchInitialPodcasts();
+  },[]);
 
   return (
-    <div> {/* Wrap the elements inside a parent div */}
-      <Navbar expand="sm" className="navbar-container" /*bg="primary" data-bs-theme="dark"*/  >
-        <Container fluid >
-          <Navbar.Brand href="#">Podcast Book</Navbar.Brand>
-          <Navbar.Toggle aria-controls="navbarScroll" style={{ height: '50px' }}/>
-          <Navbar.Collapse id="navbarScroll" >
-            <Nav className="me-auto my-2 my-lg-0" style={{ maxHeight: '100px' }} navbarScroll>
-              <Nav.Link href="#action1">Explore</Nav.Link>
-              <Nav.Link href="#action2">Account</Nav.Link>
-            </Nav>
-           
+    <div> 
+      
+      <Modal show={showModal} onHide={() => {setShowModal(false); setCurrentEpisode(null);}} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>{currentEpisode ? currentEpisode.title || currentEpisode.title_original: 'Loading...'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {currentEpisode ? (
+          <div>
+            <h5>Audio Player:</h5>
+            <audio controls autoPlay>
+              <source src={currentEpisode.audio} type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
             
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+            <h5><br></br>Description:</h5>
+            <p dangerouslySetInnerHTML={{ __html: currentEpisode.description || currentEpisode.description_highlighted }}></p>
+            <Modal.Footer>
+              <Button className="mt-2" variant="primary" onClick={() => handleReview(currentEpisode)}>Review this Episode</Button>
+            </Modal.Footer>
+
+          </div>
+          ) : (
+            <p>Loading...</p>
+          )}
+        </Modal.Body>
+      </Modal>
+
+      <Container fluid style={{ padding: 0 }}>
+        <Row>
+          <Col>
+            <div style={{
+              backgroundImage: 'url(/HeroSectionExtension.webp)', 
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              height: '75vh', 
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+            </div>
+          </Col>
+        </Row>
+      </Container>
 
       <Container>
-        <p>Explore Podcasts</p>
+        <Row className="text-center mt-5 mb-3">
+          <h1 className="bebas-neue-regular" style={{ fontSize: '4rem' }}>Discover, listen to, & review new podcasts and episodes</h1>
+        </Row>
 
-        {/* Search Form */}
-      
+        <Form className="d-flex mb-4" onSubmit={(e) => e.preventDefault()} >
+          
+          <Form.Select className = "me-3" variant="primary" style={{width: '110px'}} aria-label="Default select example" value={searchType} onChange={handleTypeChange}>
+            <option value="podcast">Podcast</option>
+            <option value="episode">Episode</option>
+          </Form.Select>
 
-        <Form className="d-flex" onSubmit={(e) => e.preventDefault()}>
-
-        <Form.Select className = "me-3" style={{width: '110px'}} aria-label="Default select example">
-          <option value="1">Podcast</option>
-          <option value="2">Episode</option>
-        </Form.Select>
-
-        <Form.Control
-          type="search"
-          placeholder="Search"
-          className="me-2"
-          aria-label="Search"
-          value={searchQuery}
-          onChange={handleSearchChange}
-        />
-
-        <Button variant="outline-light" onClick={fetchPodcasts}>Search</Button>
+          <Form.Control
+            type="search"
+            placeholder="Search"
+            className="me-2"
+            aria-label="Search"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                fetchPodcasts();
+              }
+            }}
+          />
+          <Button variant="outline-light" onClick={fetchPodcasts}>Search</Button>
         </Form>
+        <hr className="custom-hr" />
+        <div>
+          {hasSearched ? (
+            lastSearchType === 'podcast' ? (
+              <Container className="mt-3">
+                {isLoading ? (
+                  <div>Loading...</div>
+                ) : (
+                  <Container>
+                    <Row> 
+                      <Col className="text-center my-4">
+                        <h1 className="bebas-neue-regular" style={{ fontSize: '3rem' }}>Explore Podcasts</h1>
+                      </Col>
+                    </Row>
+                    <Row>
+                      {podcasts.map((podcast, index) => (
+                        <Col xs={12} md={6} lg={4} xxl={3} key={index} className="mb-3 d-flex justify-content-center">
+                          <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3 d-flex flex-column">
+                            <Image src={podcast.image} alt="podcast thumbnail" className="img-thumbnail mb-3"/>
+                            <h5>Podcast: {podcast.title_original}</h5>
+                            <p dangerouslySetInnerHTML={{ __html: podcast.description_highlighted.length > 150 ? podcast.description_highlighted.substring(0, 150) + '...' : podcast.description_highlighted }}></p>
+                            <Button variant="outline-primary" className="mt-auto" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
+                            <Button className="mt-2" variant="primary" onClick={() => handleReview(podcast)}>Review Podcast</Button>
+                          </Card>
+                        </Col>
+                      ))}
+                    </Row>
+                  </Container>
+                )}
+              </Container>
+            ) : lastSearchType === 'episode' ? (
+              <Container className="mt-3">
+                {isLoading ? (
+                  <div>Loading...</div>
+                ) : (
+                  <Container>
+                    <Row>
+                      <Col className="text-center my-4">
+                        <h1 className="bebas-neue-regular" style={{ fontSize: '3rem' }}>Explore Episodes</h1>
+                      </Col>
+                    </Row>
+                    <Row>
+                      {podcasts.map((episode, index) => (
+                          <Col xs={12} md={6} lg={4} xxl={3} key={index} className="mb-3 d-flex justify-content-center">
+                            <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3 d-flex flex-column">
+                              <Image src={episode.image} alt="episode thumbnail" className="img-thumbnail mb-3"/>
+                              <h5>Episode: {episode.title_original}</h5>
+                              <p dangerouslySetInnerHTML={{ __html: episode.description_highlighted.length > 150 ? episode.description_highlighted.substring(0, 150) + '...': episode.description_highlighted }}></p>
+                              <Button variant="outline-primary" className="mt-auto" onClick={() => handleCurrentEpisode(episode)}>Play Episode</Button>
+                              <Button className="mt-2" variant="primary" onClick={() => handleReview(episode)}>Review Episode</Button>
 
-      {/* Display area for podcasts */}
-    <div>
-      {!hasSearched ? (
-
-        <div className="review-container">
-          {error ? (
-            <div>Error: {error}</div>
-          ) : podcasts.length > 0 ? (
-            podcasts.map((podcast) => (
-              <PodcastBox
-                key={podcast.id} // Assuming each podcast has a unique 'id'
-                title={podcast.title}
-                language={podcast.language}
-                image={podcast.image}
-                description={podcast.description}
-              />
-            ))
+                            </Card>
+                          </Col>
+                        ))}
+                      </Row>
+                  </Container>
+                )}
+              </Container>
+            ) : null
           ) : (
-            <div>No reviews found</div>
+            <div className="review-container">
+              {error ? (
+                <div>Error: {error}</div>
+              ) : podcasts.length > 0 ? (
+                <Container>
+                  <Row> 
+                    <Col className="text-center my-4">
+                      <h1 className="bebas-neue-regular" style={{ fontSize: '3rem' }}>Explore the Best Podcasts of the Week</h1>
+                    </Col>
+                  </Row>
+                  <Row>
+                    {podcasts.map((podcast, index) => (
+                        <Col xs={12} md={6} lg={4} xxl={3} key={index} className="mb-3 d-flex justify-content-center">
+                          <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3 d-flex flex-column">
+                            <img src={podcast.image} alt="Podcast Cover" className="img-thumbnail mb-3" />
+                            <h5>Podcast: {podcast.title}</h5>
+                            <p>Language: {podcast.language}</p>
+                            <p dangerouslySetInnerHTML={{ __html: podcast.description.length > 150 ? podcast.description.substring(0, 150) + '...' : podcast.description }}></p>
+                            <Button variant="outline-primary" className="mt-auto" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
+                            <Button className="mt-2" variant="primary" onClick={() => handleReview(podcast)}>Review this Podcast</Button>
+                          </Card>
+                        </Col>
+                    ))}
+                  </Row>
+                </Container>
+              ) : (
+                <div>No reviews found</div>
+              )}
+            </div>
           )}
         </div>
-      ) : (
-          <Container className="mt-3"> 
-            {isLoading ? (
-              <div>Loading...</div>
-            ) : (
-              podcasts.map((podcast, index) => (
-                <div key={index} className="podcast-item">
-                  <Image src={podcast.image} alt="podcast thumbnail" />
-                  <h5>{podcast.title_original}</h5>
-                  <p>{podcast.description_highlighted}</p>
-                  {/* Render more podcast details as needed */}
-                </div>
-              ))
-            )}
-        </Container>
-      )}
-    </div>
+
       </Container>
     </div>
   );
