@@ -22,6 +22,8 @@ const API_KEY = process.env.LISTEN_NOTES_KEY;
 
 /* use for testing */
 // const API_KEY = '';
+const userId = localStorage.getItem('UserID');
+console.log('UserID: ', userId);
 
 const ExplorePodcasts =() =>{
   const navigate = useNavigate();
@@ -35,7 +37,7 @@ const ExplorePodcasts =() =>{
 
   const [currentEpisode, setCurrentEpisode] = useState(null);
   const [showModal, setShowModal] = useState(false);
-
+  
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);

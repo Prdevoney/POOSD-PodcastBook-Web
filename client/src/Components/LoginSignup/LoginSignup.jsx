@@ -90,7 +90,7 @@ const LoginSignup = () => {
         const data = await response.json();
 
         if (response.ok) {
-
+          localStorage.setItem('UserID', data.UserID);
           // 4) Redirect to Explore Podcasts page upon successful login and log the data
           console.log(data); 
           window.location.href = '/explore-podcasts';
