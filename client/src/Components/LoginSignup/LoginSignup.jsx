@@ -1,6 +1,10 @@
 import React, {useState} from 'react'
+import Button from 'react-bootstrap/Button'
+import Form from 'react-bootstrap/Form'
+import Modal from 'react-bootstrap/Modal'
 import './LoginSignupStyle.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { set } from 'mongoose'
 
 const LoginSignup = () => {
 
@@ -11,7 +15,16 @@ const LoginSignup = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-  
+
+    const [otp, setOtp] = useState("");
+    const [userInfo, setUserInfo] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+
+    const handleOtpChange = (e) => {
+      setOtp(e.target.value);
+    }
+
+
     const handleSignup = async () => {
       try {
         // Check if passwords match
@@ -42,6 +55,8 @@ const LoginSignup = () => {
         if (response.ok) {
           console.log(data); // Handle response from the server as needed
           alert("Registration Successful");
+          setUserInfo(data);
+          setShowModal(true);
         } else {
           throw new Error(data.error || "Registration failed");
         }
@@ -52,8 +67,6 @@ const LoginSignup = () => {
         alert("Registration failed: " + error.message);
       }
     };
-
-
   
     const handleLogin = async () => {
       try {
@@ -85,6 +98,33 @@ const LoginSignup = () => {
       }
     };
 
+    const verifyCode = async () => {
+      try {
+        const response = await fetch('/api/verifyEmail', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            "UserID": userInfo.UserID,
+            "otp": otp,
+          })
+        });
+  
+        const data = await response.json();
+        if (response.ok) {
+          console.log(data);
+          window.location.href = '/explore-podcasts';
+        } else {
+          throw new Error(data.error || "Verification failed");
+        }
+      } catch (error) {
+        console.error("Error during verification:", error.message);
+        // Handle error
+        alert("Verification failed: " + error.message);
+      }
+    }
+
     // end of new info
 
 function handleSignUpClick(event) {
@@ -97,13 +137,38 @@ function handleLoginClick(event) {
     handleLogin();
 }
 
-    
-
-
 
   return (
 
     <div className = 'wrapper bg-dark d-flex align-items-center justify-content-center vh-100 bg-primary'>
+
+      <Modal 
+        show={showModal} 
+        onHide={() => {setShowModal(false) }} 
+        centered
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header className="justify-content-center" closeButton>
+          <Modal.Title>Verify Code</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="justify-content-center">
+          <p>Enter the code sent to your email at: {email}</p>
+          <Form.Control 
+            type="text" 
+            placeholder="Enter Code"
+            value={otp}
+            onChange={handleOtpChange}
+          />
+        </Modal.Body>
+        <Modal.Footer className="justify-content-center">
+          <Button variant="primary" onClick={() => {verifyCode()}}>
+            Verify
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+
       {action==="Login"? (
         //Login Form ----------------------------------------------------------------
       <div className = 'form_container p-5 rounded bg-white'>
