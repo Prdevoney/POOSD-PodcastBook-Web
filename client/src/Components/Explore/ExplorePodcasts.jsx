@@ -175,6 +175,12 @@ const ExplorePodcasts =() =>{
             aria-label="Search"
             value={searchQuery}
             onChange={handleSearchChange}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                fetchPodcasts();
+              }
+            }}
           />
           <Button variant="outline-light" onClick={fetchPodcasts}>Search</Button>
         </Form>
