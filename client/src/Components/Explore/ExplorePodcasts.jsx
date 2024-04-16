@@ -14,11 +14,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const { Client } = require('podcast-api');
 
-/* Use for deployment */
-const API_KEY = process.env.LISTEN_NOTES_KEY;
-
 /* use for actuall data*/
-// const API_KEY = 'e03f9deeb7fb4d8ea230d865bef7a67d';
+const API_KEY = 'e03f9deeb7fb4d8ea230d865bef7a67d';
 
 /* use for testing */
 // const API_KEY = '';
@@ -26,7 +23,6 @@ const API_KEY = process.env.LISTEN_NOTES_KEY;
 
 const userId = localStorage.getItem('UserID');
 console.log('UserID: ', userId);
-
 const ExplorePodcasts =() =>{
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
@@ -36,7 +32,6 @@ const ExplorePodcasts =() =>{
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState('');
-
   const [currentEpisode, setCurrentEpisode] = useState(null);
   const [showModal, setShowModal] = useState(false);
   
@@ -99,7 +94,7 @@ const ExplorePodcasts =() =>{
     setIsLoading(true);
     setHasSearched(true);
 
-    if (!searchQuery.trim() && hasSearched == true){
+    if (!searchQuery.trim() && hasSearched === true){
       console.error('Error: Search query cannot be empty');
       setIsLoading(false);
       return;
@@ -124,7 +119,6 @@ const ExplorePodcasts =() =>{
       console.log('Podcasts/Episodes:', response.data.results);
       setPodcasts(response.data.results);
       setLastSearchType(searchType);
-
     } catch (error) {
       console.error('Error fetching podcasts:', error);
     } finally {
@@ -151,7 +145,6 @@ const ExplorePodcasts =() =>{
                 console.log(error)
 
               });
-
           } catch (error) { 
               console.error('Error fetching reviews:', error);
               setError('Error fetching reviews');
