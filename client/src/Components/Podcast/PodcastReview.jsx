@@ -24,13 +24,18 @@ function PodcastReview() {
     const [reviews, setReviews] = useState([]);
     const [error, setError] = useState(null);
 
+    const userId = localStorage.getItem('UserID');
+    console.log('UserID: ', userId);
+    const username = localStorage.getItem('Username');
+    console.log('Username: ', username);
+
     const handleInputChange = (event) => {
         setReview(event.target.value);
       };
     
-    const PostReview = async ({Podcast, Rating, Comment, Username, UserID }) => {
+    const PostReview = async ({Podcast, Rating, Comment, Username, UserID}) => {
       try {
-        const response = await fetch(`/writeReview`, {
+        const response = await fetch(`/podcast/writeReview`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -38,7 +43,7 @@ function PodcastReview() {
             Rating, 
             Comment, 
             Username, 
-            UserID
+            UserID,
           }),
         });
   
@@ -56,6 +61,7 @@ function PodcastReview() {
     }
     
     const fetchReviews = async () => {
+        
         try {
           const response = await fetch(`/podcast/podcastReviews`, {
             method: 'POST',
@@ -85,7 +91,7 @@ function PodcastReview() {
       }, [reviewData]); // Re-fetch reviews if reviewData changes
 
     const renderReviews = () => {
-        console.log(reviews)
+        //console.log(reviews)
         return(
         <Row>
                 {reviews.map((reviews, index) => (
@@ -96,7 +102,7 @@ function PodcastReview() {
                         <Container id='starBox' className = "my-1 p-1 ms-auto" style={{color: 'black'}}>
                             {[...Array(5)].map((star, index) => {
                                 const currentRating = reviews.Rating;
-                                console.log(currentRating);
+                                //console.log(currentRating);
                                 return (
                                     <label key={index}>
                                         <input type = "radio" 
@@ -120,6 +126,7 @@ function PodcastReview() {
     };
 
     return (
+
         <>
         
             <Container className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white'}}>
@@ -207,7 +214,9 @@ function PodcastReview() {
             <Button variant="secondary" onClick={handleClose}>
                 Cancel
             </Button>
-            <Button variant="primary" onClick={handleClose}>
+            
+            
+            <Button variant="primary" onClick={() => PostReview({Podcast:reviewData.title, Rating: rating, Comment: review, Username: username, UserID: userId} )}>
                 Post Review
             </Button>
             </Modal.Footer>

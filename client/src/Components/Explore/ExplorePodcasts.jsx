@@ -24,6 +24,8 @@ const API_KEY = process.env.LISTEN_NOTES_KEY;
 // const API_KEY = '';
 const userId = localStorage.getItem('UserID');
 console.log('UserID: ', userId);
+const username = localStorage.getItem('Username');
+console.log('Username: ', username);
 
 const ExplorePodcasts =() =>{
   const navigate = useNavigate();
