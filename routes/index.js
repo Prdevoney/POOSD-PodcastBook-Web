@@ -80,7 +80,7 @@ router.post('/register', validateUser, validate, async (req, res) => {
         }, 3600000);
 
         mailTransport().sendMail({
-            from: 'emailverification@email.com',
+            from: 'emailverification@mypodcastbook.com',
             to: newUser.Email,
             subject: "Verify your email account",
             html: generateEmailTemplate(OTP),
@@ -190,7 +190,7 @@ router.post('/verifyEmail', async (req, res) => {
         await db.collection('VerificationTokens').findOneAndDelete({ owner: user._id });
 
         mailTransport().sendMail({
-            from: 'emailverification@email.com',
+            from: 'emailverification@mypodcastbook.com',
             to: user.Email,
             subject: "Your account is Verified",
             html: plainEmailTemplate(),
@@ -237,10 +237,10 @@ router.post('/forgotPassword', async (req, res) => {
    await db.collection('ResetTokens').insertOne(resetToken);
 
    mailTransport().sendMail({
-        from: 'security@email.com',
+        from: 'security@mypodcastbook.com',
         to: user.Email,
         subject: "Password Reset",
-        html: generatePasswordResetTemplate(`http://localhost:3000/resetPassword?token=${ranbytes}&id=${user._id}`),
+        html: generatePasswordResetTemplate(`https://podcastd-test.azurewebsites.net/resetPassword?token=${ranbytes}&id=${user._id}`),
     });
 
     res.json({success: true, message: 'Password reset link is sent to your email.'});

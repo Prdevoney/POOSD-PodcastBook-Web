@@ -1,0 +1,31 @@
+
+.form_container {
+    width: 30%;
+}
+
+@media screen and (max-width: 1000px) {
+    .form_container {
+        width: 45%;
+    }
+}
+
+@media screen and (max-width: 700px) {
+    .form_container {
+        width: 65%;
+    }
+}
+.underline {
+    width: 61px;
+    height: 5=6px;
+    background-color: #455ec4;
+    border-radius: 9px;
+}
+
+
+.background-image {
+    background-image: 'url(/HeroSectionExtension.webp)';
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    width: 100%;
+}
