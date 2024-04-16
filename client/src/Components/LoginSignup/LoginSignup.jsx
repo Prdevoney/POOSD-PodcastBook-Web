@@ -52,8 +52,7 @@ const LoginSignup = () => {
         console.log(data);
 
         if (response.ok) {
-          console.log(data); // Handle response from the server as needed
-          alert("Registration Successful");
+          console.log(data);
           setUserInfo(data);
           setShowModal(true);
         } else {
