@@ -1,7 +1,9 @@
 import './App.css';
+
 import LoginSignup from './Components/LoginSignup/LoginSignup';
 import ExplorePodcasts from './Components/Explore/ExplorePodcasts';
 import Account from './Components/UserAccount/Account';
+import Form from './Components/PasswordForm/Forms';
 import PodcastReview from './Components/Podcast/PodcastReview';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -54,8 +56,11 @@ function App() {
       <Routes>
         <Route exat path="/" element={<LoginSignup />} />
         <Route path="/explore-podcasts" element={<ExplorePodcasts />} />
+
+        <Route path="/resetPassword" element = {<Form/>} />
         <Route path="/account" element={<Account/>}/>
         <Route path="/review-podcast" element={<PodcastReview/>}/>
+
       </Routes>
     </Router>
   );
