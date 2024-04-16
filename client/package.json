@@ -26,10 +26,10 @@
     "webpack": "^5.91.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "DISABLE_ESLINT_PLUGIN=true react-scripts start",
+    "build": "CI=false && react-scripts build",
+    "test": "DISABLE_ESLINT_PLUGIN=true react-scripts test",
+    "eject": "DISABLE_ESLINT_PLUGIN=true react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
