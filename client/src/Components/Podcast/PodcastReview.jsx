@@ -9,6 +9,7 @@ import Col from 'react-bootstrap/Col';
 import './PodcastReviewStyle.css';
 
 function PodcastReview() {
+    
     const location = useLocation();
     const { reviewData } = location.state || {};
 

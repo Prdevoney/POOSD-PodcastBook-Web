@@ -14,11 +14,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const { Client } = require('podcast-api');
 
+/* Use for deployment */
+const API_KEY = process.env.LISTEN_NOTES_KEY;
+
 /* use for actuall data*/
 // const API_KEY = 'fbc6a6fd278f4f91a42b56cbd0f911f0';
 
 /* use for testing */
-const API_KEY = '';
+// const API_KEY = '';
 
 const ExplorePodcasts =() =>{
   const navigate = useNavigate();
@@ -91,6 +94,14 @@ const ExplorePodcasts =() =>{
   const fetchPodcasts = async () => {
     setIsLoading(true);
     setHasSearched(true);
+
+    if (!searchQuery.trim()){
+      console.error('Error: Search query cannot be empty');
+      setIsLoading(false); 
+      setHasSearched(false);
+      return; 
+    }
+
     const client = Client({ apiKey: API_KEY });
     try {
       // Use the search method from the client
@@ -150,12 +161,17 @@ const ExplorePodcasts =() =>{
         <Modal.Body>
           {currentEpisode ? (
           <div>
+            <h5>Audio Player:</h5>
             <audio controls autoPlay>
               <source src={currentEpisode.audio} type="audio/mpeg" />
               Your browser does not support the audio element.
             </audio>
+            
+            <h5><br></br>Description:</h5>
             <p dangerouslySetInnerHTML={{ __html: currentEpisode.description || currentEpisode.description_highlighted }}></p>
-            <Button className="mt-2" variant="primary" onClick={() => handleReview(currentEpisode)}>Review Episode</Button>
+            <Modal.Footer>
+              <Button className="mt-2" variant="primary" onClick={() => handleReview(currentEpisode)}>Review this Episode</Button>
+            </Modal.Footer>
 
           </div>
           ) : (
@@ -226,11 +242,11 @@ const ExplorePodcasts =() =>{
                     <Row>
                       {podcasts.map((podcast, index) => (
                         <Col xs={12} md={6} lg={4} xxl={3} key={index} className="mb-3 d-flex justify-content-center">
-                          <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3">
-                            <Image src={podcast.image} alt="podcast thumbnail" />
+                          <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3 d-flex flex-column">
+                            <Image src={podcast.image} alt="podcast thumbnail" className="img-thumbnail mb-3"/>
                             <h5>Podcast: {podcast.title_original}</h5>
                             <p dangerouslySetInnerHTML={{ __html: podcast.description_highlighted.length > 150 ? podcast.description_highlighted.substring(0, 150) + '...' : podcast.description_highlighted }}></p>
-                            <Button variant="outline-primary" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
+                            <Button variant="outline-primary" className="mt-auto" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
                             <Button className="mt-2" variant="primary" onClick={() => handleReview(podcast)}>Review Podcast</Button>
                           </Card>
                         </Col>
@@ -253,11 +269,11 @@ const ExplorePodcasts =() =>{
                     <Row>
                       {podcasts.map((episode, index) => (
                           <Col xs={12} md={6} lg={4} xxl={3} key={index} className="mb-3 d-flex justify-content-center">
-                            <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3">
-                              <Image src={episode.image} alt="episode thumbnail" />
+                            <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3 d-flex flex-column">
+                              <Image src={episode.image} alt="episode thumbnail" className="img-thumbnail mb-3"/>
                               <h5>Episode: {episode.title_original}</h5>
                               <p dangerouslySetInnerHTML={{ __html: episode.description_highlighted.length > 150 ? episode.description_highlighted.substring(0, 150) + '...': episode.description_highlighted }}></p>
-                              <Button variant="outline-primary" onClick={() => handleCurrentEpisode(episode)}>Play Episode</Button>
+                              <Button variant="outline-primary" className="mt-auto" onClick={() => handleCurrentEpisode(episode)}>Play Episode</Button>
                               <Button className="mt-2" variant="primary" onClick={() => handleReview(episode)}>Review Episode</Button>
 
                             </Card>
@@ -282,12 +298,12 @@ const ExplorePodcasts =() =>{
                   <Row>
                     {podcasts.map((podcast, index) => (
                         <Col xs={12} md={6} lg={4} xxl={3} key={index} className="mb-3 d-flex justify-content-center">
-                          <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3">
+                          <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3 d-flex flex-column">
                             <img src={podcast.image} alt="Podcast Cover" className="img-thumbnail mb-3" />
                             <h5>Podcast: {podcast.title}</h5>
                             <p>Language: {podcast.language}</p>
                             <p dangerouslySetInnerHTML={{ __html: podcast.description.length > 150 ? podcast.description.substring(0, 150) + '...' : podcast.description }}></p>
-                            <Button variant="outline-primary" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
+                            <Button variant="outline-primary" className="mt-auto" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
                             <Button className="mt-2" variant="primary" onClick={() => handleReview(podcast)}>Review this Podcast</Button>
                           </Card>
                         </Col>
