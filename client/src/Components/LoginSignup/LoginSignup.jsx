@@ -1,5 +1,4 @@
 import React, {useState} from 'react'
-import { useNavigate } from 'react-router-dom';
 
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form'
@@ -9,7 +8,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const LoginSignup = () => {
 
-    const navigate = useNavigate();
 
     const [action,setAction] = useState("Login");
     const [email, setEmail] = useState("");
@@ -90,7 +88,7 @@ const LoginSignup = () => {
         const data = await response.json();
 
         if (response.ok) {
-
+          localStorage.setItem('UserID', data.UserID);
           // 4) Redirect to Explore Podcasts page upon successful login and log the data
           console.log(data); 
           window.location.href = '/explore-podcasts';
