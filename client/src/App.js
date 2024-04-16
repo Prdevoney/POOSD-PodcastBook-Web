@@ -4,7 +4,7 @@ import ExplorePodcasts from './Components/Explore/ExplorePodcasts';
 import Account from './Components/UserAccount/Account';
 import PodcastReview from './Components/Podcast/PodcastReview';
 // new added ->
-// import React, {useState} from 'react';
+import React, {useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {BrowserRouter as Router, Routes, Route, useLocation} from 'react-router-dom';
 // end of new added ->
@@ -19,6 +19,9 @@ import { NavLink } from 'react-router-dom';
 // import { useHistory } from 'react-router-dom';
 import { useNavigate} from 'react-router-dom';
 // end
+
+import { UserContext } from './Components/UserContext';
+
 
 
 function Main() {
@@ -96,18 +99,22 @@ function Main() {
 
 }
 function App() {
+  const [UserID, setUserID] = useState(null);
 
 
 
   return (
     <Router>
       <Main />
+      <UserContext.Provider value={{ UserID, setUserID }}>
+    
       <Routes>
         <Route exat path="/" element={<LoginSignup />} />
         <Route path="/explore-podcasts" element={<ExplorePodcasts />} />
         <Route path="/account" element={<Account/>}/>
         <Route path="/review-podcast" element={<PodcastReview/>}/>
       </Routes>
+      </UserContext.Provider>
     </Router>
   );
 }

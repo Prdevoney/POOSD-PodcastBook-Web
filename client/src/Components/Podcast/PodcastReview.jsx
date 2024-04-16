@@ -11,6 +11,7 @@ import './PodcastReviewStyle.css';
 function PodcastReview() {
     const location = useLocation();
     const { reviewData } = location.state || {};
+    // const { UserID } = location.state || {};
 
     const [rating, setRating] = useState(null);
     const [hover, setHover] = useState(null);

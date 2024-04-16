@@ -1,8 +1,14 @@
 import React, {useState} from 'react'
 import './LoginSignupStyle.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { useNavigate} from 'react-router-dom';
+import { useContext } from 'react';
+import { UserContext } from '../UserContext';
+
 
 const LoginSignup = () => {
+    const navigate = useNavigate();
+    const { setUserID } = useContext(UserContext);
 
     const [action,setAction] = useState("Login");
 
@@ -70,9 +76,16 @@ const LoginSignup = () => {
         });
   
         const data = await response.json();
+
         if (response.ok) {
           console.log(data); // Handle response from the server as needed
-          
+          const UserID = data.UserID;
+          localStorage.setItem('UserID', UserID)
+          console.log(UserID);
+          // setUserID(UserID);
+          console.log(setUserID);
+
+          // navigate('/explore-podcasts',{ replace: true });
           // Redirect to Explore Podcasts page upon successful login
           window.location.href = '/explore-podcasts';
         } else {
@@ -252,4 +265,4 @@ function handleLoginClick(event) {
   );
 };
 
-export default LoginSignup
+export default LoginSignup;

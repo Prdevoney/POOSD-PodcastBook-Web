@@ -11,6 +11,10 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import './ExplorePageStyle.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+// import { useParams } from 'react-router-dom';
+// import { useLocation } from 'react-router-dom';
+
+
 
 const { Client } = require('podcast-api');
 
@@ -21,6 +25,9 @@ const { Client } = require('podcast-api');
 const API_KEY = '';
 
 const ExplorePodcasts =() =>{
+  // const location = useLocation();
+  // const { UserID } = location.state || {};
+  // console.log('this is the ' + UserID);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchType, setSearchType] = useState('podcast');
