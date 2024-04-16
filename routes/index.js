@@ -144,6 +144,11 @@ router.post('/login', async (req, res) => {
     }
 });
 
+router.get("/verify-token", isResetTokenValid, (req, res) => {
+    console.log("hello");
+    res.json({success : true });
+});
+
 router.post('/verifyEmail', async (req, res) => {
     try {
         const { UserID, otp } = req.body;
@@ -628,7 +633,7 @@ router.post('/SearchUser', async (req, res) => {
     }
 });
 
-router.post('/getUserInfo',  async (req, res) => {
+router.post('/getUserInfo', async (req, res) => {
     try {
         // Extract UserID from request body
         const { UserID } = req.body;
