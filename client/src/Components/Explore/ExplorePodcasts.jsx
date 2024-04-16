@@ -18,10 +18,12 @@ const { Client } = require('podcast-api');
 const API_KEY = process.env.LISTEN_NOTES_KEY;
 
 /* use for actuall data*/
-// const API_KEY = 'fbc6a6fd278f4f91a42b56cbd0f911f0';
+// const API_KEY = 'e03f9deeb7fb4d8ea230d865bef7a67d';
 
 /* use for testing */
 // const API_KEY = '';
+
+
 const userId = localStorage.getItem('UserID');
 console.log('UserID: ', userId);
 
@@ -97,6 +99,11 @@ const ExplorePodcasts =() =>{
     setIsLoading(true);
     setHasSearched(true);
 
+    if (!searchQuery.trim() && hasSearched == true){
+      console.error('Error: Search query cannot be empty');
+      setIsLoading(false);
+      return;
+    }
     if (!searchQuery.trim()){
       console.error('Error: Search query cannot be empty');
       setIsLoading(false); 
@@ -117,6 +124,7 @@ const ExplorePodcasts =() =>{
       console.log('Podcasts/Episodes:', response.data.results);
       setPodcasts(response.data.results);
       setLastSearchType(searchType);
+
     } catch (error) {
       console.error('Error fetching podcasts:', error);
     } finally {
