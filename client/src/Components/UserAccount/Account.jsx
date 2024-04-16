@@ -1,11 +1,9 @@
 import React from 'react'
-import { Button, Container, Modal, Form, Stack } from 'react-bootstrap';
-import {useState, useEffect} from 'react';
-import Image from 'react-bootstrap/Image';
+import { Button, Container, Stack } from 'react-bootstrap';
+// import {useState, useEffect} from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import './AccountStyle.css'
-import Podcast from 'podcast-api'
 
 // import { useLocation } from 'react-router-dom';
 
@@ -14,7 +12,7 @@ function Account() {
     // const location = useLocation();
     // const searchTerm = location.state.searchTerm;
     const numberOfReviews = 5;
-    const [username, setUsername] = useState('');
+    // const [username, setUsername] = useState('');
 
     const renderReviews = () => {
       return [...Array(numberOfReviews)].map((_, index) => (
@@ -50,7 +48,7 @@ function Account() {
       <Row>
         <Col sm={3} className="d-flex justify-content-center" style={{borderColor: 'black' ,borderRight: '2px solid black' }}>
           <Stack gap={5} className ="text-center">
-            <h1>Hello, {username}</h1>
+            {/* <h1>Hello, {username}</h1> */}
             <h6> email</h6>
             <h6> username</h6>
             <Button className = "d-inline-block align-self-center" variant="primary">Update Account Settings</Button>
