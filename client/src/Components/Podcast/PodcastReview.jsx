@@ -1,5 +1,5 @@
 import React from 'react';
-import {useState } from 'react';
+import {useState, useEffect } from 'react';
 import {useLocation} from 'react-router-dom';
 import {FaStar} from 'react-icons/fa';
 import { Button, Container, Modal, Form } from 'react-bootstrap';
@@ -20,17 +20,102 @@ function PodcastReview() {
     const handleShow = () => setShow(true);
     const numberOfReviews = 8;
 
+    const [reviews, setReviews] = useState([]);
+    const [error, setError] = useState(null);
+
     const handleInputChange = (event) => {
         setReview(event.target.value);
       };
     
+    const PostReview = async ({Podcast, Rating, Comment, Username, UserID }) => {
+      try {
+        const response = await fetch(`/writeReview`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            Podcast,
+            Rating, 
+            Comment, 
+            Username, 
+            UserID
+          }),
+        });
+  
+        if (!response.ok) {
+          throw new Error(`API request failed with status ${response.status}`);
+        }
+  
+        const data = await response.json();
+        setReviews(data.reviews);
+        setError(null);
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+        setError(error.message || "An error occurred while fetching reviews");
+      }
+    }
+    
+    const fetchReviews = async () => {
+        try {
+          const response = await fetch(`/podcast/podcastReviews`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              Podcast: reviewData.title, // Check if reviewData exists
+              page: 1,
+            }),
+          });
+    
+          if (!response.ok) {
+            throw new Error(`API request failed with status ${response.status}`);
+          }
+    
+          const data = await response.json();
+          setReviews(data.reviews);
+          //console.log(data.reviews);
+          setError(null);
+        } catch (error) {
+          console.error("Error fetching reviews:", error);
+          setError(error.message || "An error occurred while fetching reviews");
+        }
+      };
+    
+      useEffect(() => {
+        fetchReviews();
+      }, [reviewData]); // Re-fetch reviews if reviewData changes
+
     const renderReviews = () => {
-        return [...Array(numberOfReviews)].map((_, index) => (
-            <Container key={index-1} id="reviewBoxes" className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white'}}>   
-            <h1>Reviews</h1>
-            <p>Fill in Podcast reviews... from our database</p>
-          </Container>
-        ));
+        console.log(reviews)
+        return(
+        <Row>
+                {reviews.map((reviews, index) => (
+                <Container key={index-1} id="reviewBoxes" className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white', textAlign: 'center'}}> 
+                        <h5>{reviews.Username}</h5>
+                        <p>{reviews.Comment}</p>
+
+                        <Container id='starBox' className = "my-1 p-1 ms-auto" style={{color: 'black'}}>
+                            {[...Array(5)].map((star, index) => {
+                                const currentRating = reviews.Rating;
+                                console.log(currentRating);
+                                return (
+                                    <label key={index}>
+                                        <input type = "radio" 
+                                            name = "rating"
+                                            value={currentRating}
+                                        />
+                                        <FaStar id = 'star' 
+                                            size={30} 
+                                            color = {index<currentRating ? 'yellow' : 'grey' }
+                                        /> 
+                                    </label>
+                                ); 
+                            })}
+                            </Container>
+
+                </Container>
+       
+                ))}
+        </Row>
+        );
     };
 
     return (
@@ -39,13 +124,12 @@ function PodcastReview() {
             <Container className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white'}}>
                 <Row>
                     <Col sm={4}>
-                        <Image src="holder.js/171x180" thumbnail />
+                        <Image src= {reviewData.image} thumbnail />
                     </Col>
                     <Col>
                         <Row>
                             <Col>
                             <h1>{reviewData.title}</h1>
-                            <p>{reviewData.description}</p>
                             </Col>
                             <Col sm={3} className ='ml-auto'>
                               <Button variant="primary" onClick={handleShow}>Add Review</Button>
@@ -71,7 +155,7 @@ function PodcastReview() {
                             </Container>
                         </Row>
                         <Row>
-                            <p>Fill in Podcast description...</p>
+                            <p>{reviewData.description}</p>
                         </Row>
                     </Col>
                 </Row>
