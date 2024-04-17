@@ -1,23 +1,29 @@
 import React, {useState} from 'react'
+
+import Button from 'react-bootstrap/Button'
+import Form from 'react-bootstrap/Form'
+import Modal from 'react-bootstrap/Modal'
 import './LoginSignupStyle.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { useNavigate} from 'react-router-dom';
-import { useContext } from 'react';
-import { UserContext } from '../UserContext';
-
 
 const LoginSignup = () => {
-    const navigate = useNavigate();
-    const { setUserID } = useContext(UserContext);
+
 
     const [action,setAction] = useState("Login");
-
-    // new info ---> 
     const [email, setEmail] = useState("");
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-  
+
+    const [otp, setOtp] = useState("");
+    const [userInfo, setUserInfo] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+
+    const handleOtpChange = (e) => {
+      setOtp(e.target.value);
+    }
+
+
     const handleSignup = async () => {
       try {
         // Check if passwords match
@@ -46,8 +52,9 @@ const LoginSignup = () => {
         console.log(data);
 
         if (response.ok) {
-          console.log(data); // Handle response from the server as needed
-          alert("Registration Successful");
+          console.log(data);
+          setUserInfo(data);
+          setShowModal(true);
         } else {
           throw new Error(data.error || "Registration failed");
         }
@@ -58,9 +65,8 @@ const LoginSignup = () => {
         alert("Registration failed: " + error.message);
       }
     };
-
-
   
+    // 1) This is the function that handles the login
     const handleLogin = async () => {
       try {
         // Send login data to backend
@@ -70,23 +76,20 @@ const LoginSignup = () => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
+            // 2) I send the username and password to the server
             "Username": username,
             "Password": password
           })
         });
-  
+        
+        // 3) I get the response from the server and set it in the 'data' variable
+        //    Within this response is the UserID that you may need to pass through to use on other pages. 
         const data = await response.json();
 
         if (response.ok) {
-          console.log(data); // Handle response from the server as needed
-          const UserID = data.UserID;
-          localStorage.setItem('UserID', UserID)
-          console.log(UserID);
-          // setUserID(UserID);
-          console.log(setUserID);
-
-          // navigate('/explore-podcasts',{ replace: true });
-          // Redirect to Explore Podcasts page upon successful login
+          localStorage.setItem('UserID', data.UserID);
+          // 4) Redirect to Explore Podcasts page upon successful login and log the data
+          console.log(data); 
           window.location.href = '/explore-podcasts';
         } else {
           throw new Error(data.error || "Login failed");
@@ -97,6 +100,38 @@ const LoginSignup = () => {
         alert("Login failed: " + error.message);
       }
     };
+
+    // 1) Once type in the verification code that was sent to your email
+    const verifyCode = async () => {
+      try {
+        const response = await fetch('/api/verifyEmail', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            // 2) the I got the UserID from the response of the signup API in the function handleSignup
+            "UserID": userInfo.UserID,
+            "otp": otp,
+          })
+        });
+        
+        // 3) I get the response from the server and set it in the 'data' variable
+        const data = await response.json();
+
+        if (response.ok) {
+          // 4) If the response is ok, I log the data and redirect to the Explore Podcasts page
+          console.log(data);
+          window.location.href = '/explore-podcasts';
+        } else {
+          throw new Error(data.error || "Verification failed");
+        }
+      } catch (error) {
+        console.error("Error during verification:", error.message);
+        // Handle error
+        alert("Verification failed: " + error.message);
+      }
+    }
 
     // end of new info
 
@@ -110,13 +145,38 @@ function handleLoginClick(event) {
     handleLogin();
 }
 
-    
-
-
 
   return (
 
     <div className = 'wrapper bg-dark d-flex align-items-center justify-content-center vh-100 bg-primary'>
+
+      <Modal 
+        show={showModal} 
+        onHide={() => {setShowModal(false) }} 
+        centered
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header className="justify-content-center" closeButton>
+          <Modal.Title>Verify Code</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="justify-content-center">
+          <p>Enter the code sent to your email at: {email}</p>
+          <Form.Control 
+            type="text" 
+            placeholder="Enter Code"
+            value={otp}
+            onChange={handleOtpChange}
+          />
+        </Modal.Body>
+        <Modal.Footer className="justify-content-center">
+          <Button variant="primary" onClick={() => {verifyCode()}}>
+            Verify
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+
       {action==="Login"? (
         //Login Form ----------------------------------------------------------------
       <div className = 'form_container p-5 rounded bg-white'>
@@ -186,83 +246,7 @@ function handleLoginClick(event) {
         // ----------------------------------------------------------------
       )}
     </div>
-
-
-
-
-
-
-
-
-
-
-
-    // <div className = 'container'>
-    //     <div className = "header">
-    //         <div className = "text">{action}</div>
-    //         <div className = "underline"></div>
-    //     </div>
-    //     <div className = "inputs">
-    //         {/* {action==="Login"?<div></div>: <div className = "input">
-    //         <input type = "text" placeholder = "Name" />
-    //         </div>}
-
-    //         <div className = "input">
-    //             <input type = "text" placeholder = "Username" />
-    //         </div> */}
-            
-    //         {action==="Login"? (
-    //             <form>
-    //                 <div className = "input">
-    //                     <input type = "text" value ={username} onChange={e => setUsername(e.target.value)} placeholder = "Username" />
-    //                 </div>
-    //                 <div className = "input">
-    //                     <input type = "password" value ={password} onChange={e => setPassword(e.target.value)} placeholder = "Password" />
-    //                 </div>
-    //                 <div className = "button">
-    //                 <button className ="btn" onClick={handleLoginClick}>Login</button>
-    //                 </div>
-    //             </form>
-    //             ):(
-    //             <form>
-    //                 {/* <div className = "input">
-    //                     <input type = "text" placeholder = "Name" />
-    //                 </div> */}
-    //                 <div className = "input">
-    //                     <input type = "text" value ={username} onChange={e => setUsername(e.target.value)} placeholder = "Username" />
-    //                 </div>
-    //                 <div className = "input">
-    //                     <input type = "email" value ={email} onChange={e => setEmail(e.target.value)} placeholder = "Email" />
-    //                 </div>
-    //                 <div className = "input">
-    //                     <input type = "password" value ={password} onChange={e => setPassword(e.target.value)} placeholder = "Password" />
-    //                 </div>
-    //                 <div className='input'>
-    //                     <input type = "password" value ={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} placeholder = "Confirm Password" />
-    //                 </div>
-    //                 <div className = "button">
-    //                 <button className ="btn" onClick={handleSignUpClick}>Sign Up</button>
-    //                 </div>
-    //             </form>)}
-    //     </div>
-
-    //     {/* {action==="Sign Up"?<div></div>:<div className = "forgotpassword">Lost Password</div>} */}
-
-    //     <div className = "submit-container">
-    //         {/*             
-    //             <button className={action === "Login" ? "submit gray" : "submit"} onClick={handleSignUpClick}>
-    //             Sign Up
-    //             </button>
-    //             <button className={action === "Sign Up" ? "submit gray" : "submit"} onClick={handleLoginClick}>
-    //             Login
-    //             </button> */}
-
-    //         <div className = {action==="Login"?"submit gray":"submit"} onClick={()=>{setAction("Sign Up")}}>Sign Up Here</div>
-            
-    //         <div className = {action==="Sign Up"?"submit gray":"submit"} onClick={()=>{setAction("Login")}} >Login Here</div>
-    //     </div>
-    // </div>
   );
 };
 
-export default LoginSignup;
+export default LoginSignup
