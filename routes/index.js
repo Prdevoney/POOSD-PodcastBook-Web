@@ -233,7 +233,7 @@ router.post('/forgotPassword', async (req, res) => {
         from: 'security@mypodcastbook.com',
         to: user.Email,
         subject: "Password Reset",
-        html: generatePasswordResetTemplate(`https://podcastd-test.azurewebsites.net/resetPassword?token=${ranbytes}&id=${user._id}`),
+        html: generatePasswordResetTemplate(`http://localhost:3000/resetPassword?token=${ranbytes}&id=${user._id}`),
     });
 
     res.json({success: true, message: 'Password reset link is sent to your email.'});
