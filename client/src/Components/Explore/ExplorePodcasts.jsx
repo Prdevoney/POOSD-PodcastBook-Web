@@ -11,23 +11,19 @@ import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import './ExplorePageStyle.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-// import { useParams } from 'react-router-dom';
-// import { useLocation } from 'react-router-dom';
-
-
 
 const { Client } = require('podcast-api');
 
 /* use for actuall data*/
-// const API_KEY = 'fbc6a6fd278f4f91a42b56cbd0f911f0';
+// const API_KEY = 'e03f9deeb7fb4d8ea230d865bef7a67d';
 
 /* use for testing */
 const API_KEY = '';
 
+
+const userId = localStorage.getItem('UserID');
+console.log('UserID: ', userId);
 const ExplorePodcasts =() =>{
-  // const location = useLocation();
-  // const { UserID } = location.state || {};
-  // console.log('this is the ' + UserID);
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchType, setSearchType] = useState('podcast');
@@ -36,11 +32,10 @@ const ExplorePodcasts =() =>{
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [error, setError] = useState('');
-
   const [currentEpisode, setCurrentEpisode] = useState(null);
   const [showModal, setShowModal] = useState(false);
-
   
+
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
@@ -98,6 +93,19 @@ const ExplorePodcasts =() =>{
   const fetchPodcasts = async () => {
     setIsLoading(true);
     setHasSearched(true);
+
+    if (!searchQuery.trim() && hasSearched === true){
+      console.error('Error: Search query cannot be empty');
+      setIsLoading(false);
+      return;
+    }
+    if (!searchQuery.trim()){
+      console.error('Error: Search query cannot be empty');
+      setIsLoading(false); 
+      setHasSearched(false);
+      return; 
+    }
+
     const client = Client({ apiKey: API_KEY });
     try {
       // Use the search method from the client
@@ -137,7 +145,6 @@ const ExplorePodcasts =() =>{
                 console.log(error)
 
               });
-
           } catch (error) { 
               console.error('Error fetching reviews:', error);
               setError('Error fetching reviews');
@@ -148,29 +155,59 @@ const ExplorePodcasts =() =>{
   },[]);
 
   return (
-    <div> {/* Wrap the elements inside a parent div */}
+    <div> 
       
       <Modal show={showModal} onHide={() => {setShowModal(false); setCurrentEpisode(null);}} centered>
         <Modal.Header closeButton>
-          <Modal.Title>{currentEpisode ? currentEpisode.title : 'Loading...'}</Modal.Title>
+          <Modal.Title>{currentEpisode ? currentEpisode.title || currentEpisode.title_original: 'Loading...'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {currentEpisode ? (
-          <audio controls autoPlay>
-            <source src={currentEpisode.audio} type="audio/mpeg" />
-            Your browser does not support the audio element.
-          </audio>
+          <div>
+            <h5>Audio Player:</h5>
+            <audio controls autoPlay>
+              <source src={currentEpisode.audio} type="audio/mpeg" />
+              Your browser does not support the audio element.
+            </audio>
+            
+            <h5><br></br>Description:</h5>
+            <p dangerouslySetInnerHTML={{ __html: currentEpisode.description || currentEpisode.description_highlighted }}></p>
+            <Modal.Footer>
+              <Button className="mt-2" variant="primary" onClick={() => handleReview(currentEpisode)}>Review this Episode</Button>
+            </Modal.Footer>
+
+          </div>
           ) : (
             <p>Loading...</p>
           )}
         </Modal.Body>
       </Modal>
 
+      <Container fluid style={{ padding: 0 }}>
+        <Row>
+          <Col>
+            <div style={{
+              backgroundImage: 'url(/HeroSectionExtension.webp)', 
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              height: '75vh', 
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+            </div>
+          </Col>
+        </Row>
+      </Container>
 
       <Container>
+        <Row className="text-center mt-5 mb-3">
+          <h1 className="bebas-neue-regular" style={{ fontSize: '4rem' }}>Discover, listen to, & review new podcasts and episodes</h1>
+        </Row>
 
-        <Form className="d-flex my-4" onSubmit={(e) => e.preventDefault()} >
-          <Form.Select className = "me-3" style={{width: '110px'}} aria-label="Default select example" value={searchType} onChange={handleTypeChange}>
+        <Form className="d-flex mb-4" onSubmit={(e) => e.preventDefault()} >
+          
+          <Form.Select className = "me-3" variant="primary" style={{width: '110px'}} aria-label="Default select example" value={searchType} onChange={handleTypeChange}>
             <option value="podcast">Podcast</option>
             <option value="episode">Episode</option>
           </Form.Select>
@@ -191,6 +228,7 @@ const ExplorePodcasts =() =>{
           />
           <Button variant="outline-light" onClick={fetchPodcasts}>Search</Button>
         </Form>
+        <hr className="custom-hr" />
         <div>
           {hasSearched ? (
             lastSearchType === 'podcast' ? (
@@ -201,17 +239,17 @@ const ExplorePodcasts =() =>{
                   <Container>
                     <Row> 
                       <Col className="text-center my-4">
-                        <h1 style={{ fontSize: '3rem' }}>Explore Podcasts</h1>
+                        <h1 className="bebas-neue-regular" style={{ fontSize: '3rem' }}>Explore Podcasts</h1>
                       </Col>
                     </Row>
                     <Row>
                       {podcasts.map((podcast, index) => (
                         <Col xs={12} md={6} lg={4} xxl={3} key={index} className="mb-3 d-flex justify-content-center">
-                          <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3">
-                            <Image src={podcast.image} alt="podcast thumbnail" />
+                          <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3 d-flex flex-column">
+                            <Image src={podcast.image} alt="podcast thumbnail" className="img-thumbnail mb-3"/>
                             <h5>Podcast: {podcast.title_original}</h5>
                             <p dangerouslySetInnerHTML={{ __html: podcast.description_highlighted.length > 150 ? podcast.description_highlighted.substring(0, 150) + '...' : podcast.description_highlighted }}></p>
-                            <Button variant="outline-primary" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
+                            <Button variant="outline-primary" className="mt-auto" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
                             <Button className="mt-2" variant="primary" onClick={() => handleReview(podcast)}>Review Podcast</Button>
                           </Card>
                         </Col>
@@ -228,17 +266,17 @@ const ExplorePodcasts =() =>{
                   <Container>
                     <Row>
                       <Col className="text-center my-4">
-                        <h1 style={{ fontSize: '3rem' }}>Explore Episodes</h1>
+                        <h1 className="bebas-neue-regular" style={{ fontSize: '3rem' }}>Explore Episodes</h1>
                       </Col>
                     </Row>
                     <Row>
                       {podcasts.map((episode, index) => (
                           <Col xs={12} md={6} lg={4} xxl={3} key={index} className="mb-3 d-flex justify-content-center">
-                            <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3">
-                              <Image src={episode.image} alt="episode thumbnail" />
+                            <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3 d-flex flex-column">
+                              <Image src={episode.image} alt="episode thumbnail" className="img-thumbnail mb-3"/>
                               <h5>Episode: {episode.title_original}</h5>
-                              <p dangerouslySetInnerHTML={{ __html: episode.description_highlighted.length > 150 ? episode.description_highlighted.substring(0, 150) + '...' : episode.description_highlighted }}></p>
-                              <Button variant="outline-primary" onClick={() => handleCurrentEpisode(episode)}>Play Episode</Button>
+                              <p dangerouslySetInnerHTML={{ __html: episode.description_highlighted.length > 150 ? episode.description_highlighted.substring(0, 150) + '...': episode.description_highlighted }}></p>
+                              <Button variant="outline-primary" className="mt-auto" onClick={() => handleCurrentEpisode(episode)}>Play Episode</Button>
                               <Button className="mt-2" variant="primary" onClick={() => handleReview(episode)}>Review Episode</Button>
 
                             </Card>
@@ -257,18 +295,18 @@ const ExplorePodcasts =() =>{
                 <Container>
                   <Row> 
                     <Col className="text-center my-4">
-                      <h1 style={{ fontSize: '3rem' }}>Explore the Best Podcasts of the Week</h1>
+                      <h1 className="bebas-neue-regular" style={{ fontSize: '3rem' }}>Explore the Best Podcasts of the Week</h1>
                     </Col>
                   </Row>
                   <Row>
                     {podcasts.map((podcast, index) => (
                         <Col xs={12} md={6} lg={4} xxl={3} key={index} className="mb-3 d-flex justify-content-center">
-                          <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3">
+                          <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3 d-flex flex-column">
                             <img src={podcast.image} alt="Podcast Cover" className="img-thumbnail mb-3" />
                             <h5>Podcast: {podcast.title}</h5>
                             <p>Language: {podcast.language}</p>
                             <p dangerouslySetInnerHTML={{ __html: podcast.description.length > 150 ? podcast.description.substring(0, 150) + '...' : podcast.description }}></p>
-                            <Button variant="outline-primary" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
+                            <Button variant="outline-primary" className="mt-auto" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
                             <Button className="mt-2" variant="primary" onClick={() => handleReview(podcast)}>Review this Podcast</Button>
                           </Card>
                         </Col>
@@ -288,4 +326,3 @@ const ExplorePodcasts =() =>{
 }
 
 export default ExplorePodcasts;
-
