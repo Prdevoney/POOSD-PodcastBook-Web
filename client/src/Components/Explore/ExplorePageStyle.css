@@ -2,3 +2,19 @@
   /* background: linear-gradient(to right, #66d4ff, #325592); */
   background-color: #41a0ff;
 }
+
+
+.bebas-neue-regular {
+  font-family: "Bebas Neue", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+.custom-hr {
+  border-color: #ccc;
+  border-width: 2px;
+  width: 100%;
+  margin-top: 10px;
+  /* margin-bottom: 20px; */
+}
