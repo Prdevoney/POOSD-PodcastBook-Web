@@ -144,6 +144,11 @@ router.post('/login', async (req, res) => {
     }
 });
 
+router.get("/verify-token", isResetTokenValid, (req, res) => {
+    console.log("hello");
+    res.json({success : true });
+});
+
 router.post('/verifyEmail', async (req, res) => {
     try {
         const { UserID, otp } = req.body;
@@ -215,9 +220,9 @@ router.post('/forgotPassword', async (req, res) => {
     }
 
     const token = await db.collection('ResetTokens').findOne({owner: user._id});
-    // if (token) {
-    //     return res.status(400).json({ error: "For security reasons, you must wait 1 hour for a new link" });
-    // }
+    if (token) {
+        return res.status(400).json({ error: "For security reasons, you must wait 1 hour for a new link" });
+    }
 
    const ranbytes = await createRandomBytes();
    const resetToken = {
@@ -277,7 +282,7 @@ router.post('/resetPassword', isResetTokenValid, async(req, res) => {
     await db.collection('ResetTokens').findOneAndDelete({owner: user._id});
 
     mailTransport().sendMail({
-        from: 'security@email.com',
+        from: 'security@mypodcastbook.com',
         to: user.Email,
         subject: "Password Reset Successfully",
         html: resetSuccessfullTemplate(),

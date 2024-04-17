@@ -3,11 +3,11 @@ import { useLocation, } from "react-router";
 import { useNavigate } from 'react-router-dom'
 import queryString from 'query-string';
 import axios from "axios";
-import './Forms.css'
+import './Form.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 // const baseurl = 'https://podcastd-test.azurewebsites.net/api'
-const baseurl = 'https://localhost:3000/api'
+const baseurl = 'http://localhost:5000/api'
 
 
 export default function Form() {
@@ -25,14 +25,15 @@ export default function Form() {
 
     const verifyToken = async () => {
         try {
-
-            const { data } = await axios(`${baseurl}/verify-token?token=${token}&id=${id}`)
-
-            //console.log(data);
+            console.log('token: ' + token + ' id: ' + id);
+            const response = await axios(`${baseurl}/verify-token?token=${token}&id=${id}`)
+            const data = response.data;
+            console.log('response: ' + data);
 
             if (!data.success) return setInvalidUser(data.error);
         } catch (error) {
-
+            console.log("hello");
+            console.error('Error verifying token', error.data)
             if (error?.response?.data) {
                 const { data } = error.response;
                 if (!data.success) return setInvalidUser(data.error);
@@ -72,7 +73,8 @@ export default function Form() {
             //console.log(data);
 
             if (data.success) {
-                navigate('/resetPassword');
+                alert('Password reset successful! Will redirect to login page.');
+                navigate('/');
                 setSuccess(true);
             }
         } catch (error) {

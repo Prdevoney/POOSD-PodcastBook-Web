@@ -46,6 +46,8 @@ const LoginSignup = () => {
 
         if (response.ok) {
           console.log(data);
+          setShowModalPass(false);
+          alert("Password reset email sent to: " + forgotPassEmail + ". Please check your email.");
         } else {
           throw new Error(data.error || "forgot password failed");
         }
@@ -200,10 +202,19 @@ function handleLoginClick(event) {
             placeholder="Enter Code"
             value={otp}
             onChange={handleOtpChange}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                verifyCode();
+              }
+            }}
           />
         </Modal.Body>
         <Modal.Footer className="justify-content-center">
-          <Button variant="primary" onClick={() => {verifyCode()}}>
+          <Button 
+            variant="primary" 
+            onClick={() => {verifyCode()}}
+          >
             Verify
           </Button>
         </Modal.Footer>
@@ -227,10 +238,19 @@ function handleLoginClick(event) {
             placeholder="example@email.com"
             value={forgotPassEmail}
             onChange={handleForgotPassEmailChange}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                event.preventDefault();
+                forgotPassword();
+              }
+            }}
           />
         </Modal.Body>
         <Modal.Footer className="justify-content-center">
-          <Button variant="primary" onClick={() => {forgotPassword()}}>
+          <Button 
+            variant="primary" 
+            onClick={() => {forgotPassword()}}
+            >
             Submit
           </Button>
         </Modal.Footer>

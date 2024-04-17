@@ -3,6 +3,7 @@ import LoginSignup from './Components/LoginSignup/LoginSignup';
 import ExplorePodcasts from './Components/Explore/ExplorePodcasts';
 import Account from './Components/UserAccount/Account';
 import PodcastReview from './Components/Podcast/PodcastReview';
+import Forms from './Components/PasswordForm/Form';
 // new added ->
 import React, {useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -13,11 +14,8 @@ import {BrowserRouter as Router, Routes, Route, useLocation} from 'react-router-
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
 import { NavLink } from 'react-router-dom';
 // import { useHistory } from 'react-router-dom';
-import { useNavigate} from 'react-router-dom';
 // end
 
 import { UserContext } from './Components/UserContext';
@@ -28,27 +26,12 @@ function Main() {
   const location = useLocation();
   const showNavbar = location.pathname !== '/';
   // const [searchResults, setSearchResults] = useState([]);
-  const navigate = useNavigate();
 
-  const handleSearch = (event) => {
-    // Work on the search API call here
-    event.preventDefault();
-    const searchTerm = event.target.elements[0].value;
-    const encodedSearchTerm = encodeURIComponent(searchTerm);
-
-    if (location.pathname === '/explore-podcasts') {
-      
-      navigate('/explore-podcasts', { state: { searchTerm: encodedSearchTerm } });
-    } else if (location.pathname === '/account') {
-      navigate('/explore-podcasts', { state: { searchTerm: encodedSearchTerm } });
-    }
-    
-  }
 
   return (
     <>
       {showNavbar && (
-        <Navbar expand="sm" className="navbar-container" sticky="top" /*bg="primary" data-bs-theme="dark"*/  >
+        <Navbar expand="sm" className="navbar-container" sticky="top">
           <Container fluid >
           <img
                 src="/penguin.png" 
@@ -67,29 +50,7 @@ function Main() {
               <Navbar.Text className ="d-none d-sm-inline" style={{ color: 'inherit', fontSize: '20px', fontWeight: 'bold' , paddingRight: '30px'}}> | </Navbar.Text>
               <Nav.Link as={NavLink} to="/account" style={{ textDecoration: location.pathname === '/account' ? 'underline' : 'none', color: location.pathname === '/account' ? 'white' : 'inherit', fontSize: '20px' ,paddingRight: '30px' }}>Account</Nav.Link>
             </Nav>
-              
-{/*     Just commented out the search bar for now. my-2 my-lg-0
-
-            {location.pathname !== '/review-podcast' && (
-              <>
-             <Form.Select className = "me-3" style={{width: '110px'}} aria-label="Default select example">
-              <option value="1">Podcast</option>
-              <option value="2">Episode</option>
-              </Form.Select>
-             
-             <Form className="d-flex">
-                <Form.Control
-                  type="search"
-                  placeholder="Search"
-                  className="me-2"
-                  aria-label="Search"
-                  onSubmit={handleSearch}
-                />
-                <Button variant="outline-light">Search</Button>
-              </Form>
-              </>
-              )} */}
-
+          
             </Navbar.Collapse>
           </Container>
         </Navbar>
@@ -113,7 +74,7 @@ function App() {
         <Route path="/explore-podcasts" element={<ExplorePodcasts />} />
         <Route path="/account" element={<Account/>}/>
         <Route path="/review-podcast" element={<PodcastReview/>}/>
-        <Route path="/resetPassword" element = {<Form/>} />
+        <Route path="/resetPassword" element = {<Forms/>} />
       </Routes>
       </UserContext.Provider>
     </Router>
