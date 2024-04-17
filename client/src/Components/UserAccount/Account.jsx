@@ -10,6 +10,7 @@ import { UserContext } from '../UserContext';
 import Podcast from 'podcast-api'
 import {FaStar} from 'react-icons/fa';
 
+
 // import { useLocation } from 'react-router-dom';
 
 
@@ -30,6 +31,56 @@ function Account() {
     const [userEmail, setEmail] = useState('');
     const [userReviews, setReviews] = useState([]);
     console.log('email: ' + userEmail);
+
+    const [popupData, setPopupData] = useState({podcastID: '', podcastTitle: '', rating: '', comment: ''});
+    
+    const handlePopup = (podcastID, podcastTitle, rating, comment) => {
+      setPopupData({podcastID, podcastTitle, rating, comment});
+      setNewReview(comment);
+      console.log("this is rating" + rating);
+      setShow(true);
+    };
+
+    // useEffect(() => {
+    //   console.log(popupData.rating);
+    // }, [popupData.rating]);
+
+    const handleClose = () => setShow(false);
+    const [rating, setRating] = useState(null);
+    const [hover, setHover] = useState(null);
+    const [show, setShow] = useState(false);
+    const [newReview, setNewReview] = useState('');
+
+    const handleInputChange = (event) => {
+      setNewReview(event.target.value);
+    };
+
+
+    const updateReview = (newRating) => {
+      fetch('/podcast/editReview', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ReviewID: popupData.podcastID,
+          Rating: newRating,
+          Comment: newReview,
+        }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.message) {
+            console.log(data.message);
+            window.location.reload(); // Handle successful update
+            // Handle successful update
+          } else {
+            console.error(data.error);
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    };
+
 
     const deleteReview = (ReviewID) => {
       if (!ReviewID) {
@@ -108,7 +159,9 @@ function Account() {
               </Col>
               <Col className="mr-3 d-flex justify-content-center flex-column">
                 <Row className = "mr-3 mb-3">
-                  <Button variant="secondary"style= {{maxWidth: '150px'}}>Edit Review</Button>
+                  <Button variant="info" onClick={() => 
+                  handlePopup(reviewItem._id, reviewItem.Podcast, reviewItem.Rating, reviewItem.Comment)
+                  } style= {{maxWidth: '150px'}}>Edit Review</Button>
                 </Row>
                 <Row>
                   <Button variant="danger" onClick={() => 
@@ -153,7 +206,7 @@ function Account() {
           <Stack gap={5} className ="text-center">
             <h1>Hello, {username}</h1>
             <h6> Email: {userEmail} </h6>
-            <Button className = "d-inline-block align-self-center" variant="primary">Update Account Settings</Button>
+            <Button className = "d-inline-block align-self-center" variant="primary">Change Password</Button>
           </Stack>
         </Col>
 
@@ -162,6 +215,58 @@ function Account() {
             {renderReviews()}
           </Col> 
       </Row>
+      <Modal show={show} onHide={handleClose} centered>
+            <Modal.Header closeButton>
+            <Modal.Title>Edit Review for {popupData.podcastTitle}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                <Row>
+                    <Col>
+                        <h6>Rating:</h6>
+                    </Col>
+                    <Col sm='true'>
+                        <Container id='starBox' className = "my-2 p-2" style={{backgroundColor: 'white', color: 'black'}}>
+                            {[...Array(5)].map((star, index) => {
+                                const currentRating = index + 1;
+                                return (
+                                    <label key = {index}>
+                                        <input type = "radio" 
+                                            name = "rating"
+                                            value={popupData.rating}
+                                            onChange={() => setRating(currentRating)}
+                                            // checked = {currentRating === popupData.rating}
+                                        />
+
+                                        <FaStar id ='star' 
+                                            size={50} 
+                                            color={currentRating <= (hover || rating) ? "#ffc107" : "#e4e5e9"} 
+                                            onMouseEnter={() => setHover(currentRating)}
+                                            onMouseLeave={() => setHover(null)}
+                                        /> 
+                                    </label>
+                                ); 
+                            })}
+                        </Container>
+                    </Col>
+                    <p> Your rating is {rating} </p>
+
+                </Row>
+            <Form>
+                <Form.Group controlId="review">
+                <Form.Control as="textarea" rows={3} value={newReview} onChange={handleInputChange} />
+                </Form.Group>
+            </Form>
+            </Modal.Body>
+            <Modal.Footer>
+            <Button variant="secondary" onClick={handleClose}>
+                Cancel
+            </Button>
+            <Button variant="primary" onClick={()=> updateReview(rating)}>
+                Post Review
+            </Button>
+            </Modal.Footer>
+      </Modal>
+
     </>
   )
 }
