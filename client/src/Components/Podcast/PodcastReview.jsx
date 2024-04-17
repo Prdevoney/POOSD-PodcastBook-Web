@@ -24,15 +24,35 @@ function PodcastReview() {
     const [reviews, setReviews] = useState([]);
     const [error, setError] = useState(null);
 
-    const userId = localStorage.getItem('UserID');
-    console.log('UserID: ', userId);
-    const username = localStorage.getItem('Username');
-    console.log('Username: ', username);
+    const [userEmail, setEmail] = useState('');
+    const [username, setUsername] = useState('');
+
+    const UserID = localStorage.getItem('UserID');
+    console.log('UserID: ', UserID);
+    
 
     const handleInputChange = (event) => {
         setReview(event.target.value);
       };
     
+      useEffect(() => {
+      fetch('/api/getUserInfo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ UserID }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log("User Info: " + data); 
+          setUsername(data.user.Username)
+          setEmail(data.user.Email)
+        })
+        .catch(error => console.error('Error:', error));
+    }, []);
+
+
     const PostReview = async ({Podcast, Rating, Comment, Username, UserID}) => {
       try {
         const response = await fetch(`/podcast/writeReview`, {
@@ -202,7 +222,7 @@ function PodcastReview() {
             </Button>
             
             
-            <Button variant="primary" onClick={() => PostReview({Podcast:reviewData.title, Rating: rating, Comment: review, Username: username, UserID: userId} )}>
+            <Button variant="primary" onClick={() => PostReview({Podcast:reviewData.title, Rating: rating, Comment: review, Username: username, UserID: UserID} )}>
                 Post Review
             </Button>
             </Modal.Footer>
