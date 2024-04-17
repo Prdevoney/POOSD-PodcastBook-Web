@@ -1,5 +1,5 @@
 import React from 'react';
-import {useState } from 'react';
+import {useState, useEffect } from 'react';
 import {useLocation} from 'react-router-dom';
 import {FaStar} from 'react-icons/fa';
 import { Button, Container, Modal, Form } from 'react-bootstrap';
@@ -9,9 +9,9 @@ import Col from 'react-bootstrap/Col';
 import './PodcastReviewStyle.css';
 
 function PodcastReview() {
+    
     const location = useLocation();
     const { reviewData } = location.state || {};
-    // const { UserID } = location.state || {};
 
     const [rating, setRating] = useState(null);
     const [hover, setHover] = useState(null);
@@ -21,41 +21,93 @@ function PodcastReview() {
     const handleShow = () => setShow(true);
     const numberOfReviews = 8;
 
+    const [reviews, setReviews] = useState([]);
+    const [error, setError] = useState(null);
+
+    const userId = localStorage.getItem('UserID');
+    console.log('UserID: ', userId);
+    const username = localStorage.getItem('Username');
+    console.log('Username: ', username);
+
     const handleInputChange = (event) => {
         setReview(event.target.value);
       };
     
-    const renderReviews = () => {
-        return [...Array(numberOfReviews)].map((_, index) => (
-            <Container key={index-1} id="reviewBoxes" className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white'}}>   
-            <h1>Reviews</h1>
-            <p>Fill in Podcast reviews... from our database</p>
-          </Container>
-        ));
-    };
+    const PostReview = async ({Podcast, Rating, Comment, Username, UserID}) => {
+      try {
+        const response = await fetch(`/podcast/writeReview`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            Podcast : Podcast,
+            Rating : Rating, 
+            Comment : Comment, 
+            Username : Username, 
+            UserID : UserID,
+          }),
+        });
 
-    return (
-        <>
+        console.log(response);
+  
+        if (!response.ok) {
+          throw new Error(`API request failed with status ${response.status}`);
+        }
+  
+        const data = await response.json();
+        setReviews(data.reviews);
+        setError(null);
+
+        window.location.reload();
+      } catch (error) {
+        console.error("Error fetching reviews:", error);
+        setError(error.message || "An error occurred while fetching reviews");
+      }
+    }
+    
+    const fetchReviews = async () => {
         
-            <Container className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white'}}>
-                <Row>
-                    <Col sm={4}>
-                        <Image src="holder.js/171x180" thumbnail />
-                    </Col>
-                    <Col>
-                        <Row>
-                            <Col>
-                            <h1>{reviewData.title}</h1>
-                            <p>{reviewData.description}</p>
-                            </Col>
-                            <Col sm={3} className ='ml-auto'>
-                              <Button variant="primary" onClick={handleShow}>Add Review</Button>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Container id='starBox' className = "my-1 p-1 ms-auto" style={{color: 'black'}}>
+        try {
+          const response = await fetch(`/podcast/podcastReviews`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              Podcast: reviewData.title, // Check if reviewData exists
+              page: 1,
+              limit: 100, //Large value just so all show up.
+            }),
+          });
+    
+          if (!response.ok) {
+            throw new Error(`API request failed with status ${response.status}`);
+          }
+    
+          const data = await response.json();
+          setReviews(data.reviews);
+          //console.log(data.reviews);
+          setError(null);
+        } catch (error) {
+          console.error("Error fetching reviews:", error);
+          setError(error.message || "An error occurred while fetching reviews");
+        }
+      };
+    
+      useEffect(() => {
+        fetchReviews();
+      }, []); // Re-fetch reviews if reviewData changes
+
+    const renderReviews = () => {
+        //console.log(reviews)
+        return(
+        <Row>
+                {reviews ? reviews.map((reviews, index) => (
+                <Container key={index-1} id="reviewBoxes" className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white', textAlign: 'center'}}> 
+                        <h5>{reviews.Username}</h5>
+                        <p>{reviews.Comment}</p>
+
+                        <Container id='starBox' className = "my-1 p-1 ms-auto" style={{color: 'black'}}>
                             {[...Array(5)].map((star, index) => {
-                                const currentRating = index + 1;
+                                const currentRating = reviews.Rating;
+                                //console.log(currentRating);
                                 return (
                                     <label key={index}>
                                         <input type = "radio" 
@@ -64,15 +116,40 @@ function PodcastReview() {
                                         />
                                         <FaStar id = 'star' 
                                             size={30} 
-                                            color = {'yellow'}
+                                            color = {index<currentRating ? 'yellow' : 'grey' }
                                         /> 
                                     </label>
                                 ); 
                             })}
                             </Container>
+
+                </Container>
+
+                )) : null}
+        </Row>
+        );
+    };
+
+    return (
+
+        <>
+        
+            <Container className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white'}}>
+                <Row>
+                    <Col sm={4}>
+                        <Image src= {reviewData.image} thumbnail />
+                    </Col>
+                    <Col>
+                        <Row>
+                            <Col>
+                            <h1>{reviewData.title}</h1>
+                            </Col>
+                            <Col sm={3} className ='ml-auto'>
+                              <Button variant="primary" onClick={handleShow}>Add Review</Button>
+                            </Col>
                         </Row>
                         <Row>
-                            <p>Fill in Podcast description...</p>
+                            <p>{reviewData.description}</p>
                         </Row>
                     </Col>
                 </Row>
@@ -123,7 +200,9 @@ function PodcastReview() {
             <Button variant="secondary" onClick={handleClose}>
                 Cancel
             </Button>
-            <Button variant="primary" onClick={handleClose}>
+            
+            
+            <Button variant="primary" onClick={() => PostReview({Podcast:reviewData.title, Rating: rating, Comment: review, Username: username, UserID: userId} )}>
                 Post Review
             </Button>
             </Modal.Footer>
