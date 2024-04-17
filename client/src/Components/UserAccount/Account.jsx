@@ -26,7 +26,20 @@ function Account() {
     
     console.log('hello user: ' + UserID);
     
-    
+    const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+
+    const handleShowChangePasswordModal = () => setShowChangePasswordModal(true);
+    const handleCloseChangePasswordModal = () => setShowChangePasswordModal(false);
+
+    const [enterCurrentPasswordModal, setEnterCurrentPasswordModal] = useState(false);
+
+    const handleShowEnterCurrentPasswordModal = () => setEnterCurrentPasswordModal(true);
+    const handleCloseEnterCurrentPasswordModal = () => setEnterCurrentPasswordModal(false);
+
+    const [currentPassword, setCurrentPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
     const [username, setUsername] = useState('');
     const [userEmail, setEmail] = useState('');
     const [userReviews, setReviews] = useState([]);
@@ -179,6 +192,67 @@ function Account() {
 
     };
 
+    const changePassword = () => {
+      // Check if new password and confirm password are the same
+      if (newPassword !== confirmPassword) {
+        alert('New password and confirm password do not match');
+        return;
+      }
+
+      fetch('/api/updatePassword', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          id: UserID,  // Replace with the actual user ID
+          Password: newPassword,
+        }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.message) {
+            console.log(data.message);
+            handleCloseChangePasswordModal();
+            alert('Password updated successfully');
+            // Handle successful update
+          } else {
+            console.error(data.error);
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    };
+
+    
+    const continueChangePassword = async () => {
+        try {
+          // Send login data to backend
+          const response = await fetch('/api/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              "Username": username,
+              "Password": currentPassword
+            })
+          });
+    
+          const data = await response.json();
+  
+          if (response.ok) {
+            console.log(data); // Handle response from the server as needed
+            handleCloseEnterCurrentPasswordModal();
+            handleShowChangePasswordModal();
+          } else {
+            throw new Error(data.error || "Login failed");
+          }
+        } catch (error) {
+          console.error("Error during login:", error.message);
+          // Handle error
+          alert("Login failed: " + error.message);
+        }
+    };
    
 
     useEffect(() => {
@@ -206,8 +280,60 @@ function Account() {
           <Stack gap={5} className ="text-center">
             <h1>Hello, {username}</h1>
             <h6> Email: {userEmail} </h6>
-            <Button className = "d-inline-block align-self-center" variant="primary">Change Password</Button>
+            <Button className = "d-inline-block align-self-center" onClick={handleShowEnterCurrentPasswordModal} variant="primary">Change Password</Button>
           </Stack>
+
+          <Modal show = {enterCurrentPasswordModal} onHide = {handleCloseEnterCurrentPasswordModal} centered>
+            <Modal.Header closeButton>
+              <Modal.Title>Enter Current Password</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form className = 'needs-validation'>
+                <Form.Group controlId="formBasicPassword" className = 'form-group was-validated mb-2'>
+                  <Form.Label>Current Password:</Form.Label>
+                  <Form.Control type="password" placeholder="Current Password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} required />
+                  <div className = "invalid-feedback">Please confirm your password</div>
+                </Form.Group>
+              </Form>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleCloseEnterCurrentPasswordModal}>
+                Cancel
+              </Button>
+              <Button variant="primary" onClick={()=> continueChangePassword()}>
+                Enter
+              </Button>
+            </Modal.Footer>
+          </Modal>
+
+
+          <Modal show={showChangePasswordModal} onHide={handleCloseChangePasswordModal} centered>
+          <Modal.Header closeButton>
+            <Modal.Title>Change Password</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              <Form className = 'needs-validation'>
+                <Form.Group controlId="formNewPassword" className = 'form-group was-validated mb-2'>
+                  <Form.Label>New Password:</Form.Label>
+                  <Form.Control type="password" placeholder="New Password" value={newPassword} onChange={e => setNewPassword(e.target.value)} required />
+                  <div className = "invalid-feedback">Please confirm your password</div>
+                </Form.Group>
+                <Form.Group controlId="formConfirmPassword" className = 'form-group was-validated mb-2'>
+                  <Form.Label>Confirm New Password:</Form.Label>
+                  <Form.Control type="password" placeholder="Confirm New Password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required/>
+                  <div className = "invalid-feedback">Please confirm your password</div>
+                </Form.Group>
+              </Form>
+            </Modal.Body>
+            <Modal.Footer>
+            <Button variant="secondary" onClick={handleCloseChangePasswordModal}>
+                Cancel
+            </Button>
+            <Button variant="primary" onClick={()=> changePassword()}>
+                Reset Password
+            </Button>
+            </Modal.Footer>
+          </Modal>
         </Col>
 
 
