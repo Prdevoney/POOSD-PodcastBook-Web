@@ -18,11 +18,44 @@ const LoginSignup = () => {
     const [otp, setOtp] = useState("");
     const [userInfo, setUserInfo] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [showModalPass, setShowModalPass] = useState(false);
+    const [forgotPassEmail, setForgotPassEmail] = useState("");
 
     const handleOtpChange = (e) => {
       setOtp(e.target.value);
     }
 
+    const handleForgotPassEmailChange = (e) => {
+      setForgotPassEmail(e.target.value);
+    }
+
+
+    const forgotPassword = async () => {
+      try {
+        const response = await fetch('/api/forgotPassword', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            "Email": forgotPassEmail
+          })
+        });
+        const data = await response.json();
+        console.log(data);
+
+        if (response.ok) {
+          console.log(data);
+        } else {
+          throw new Error(data.error || "forgot password failed");
+        }
+      } catch (error) {
+
+        console.error("Error in forgot password:", error.message);
+        // Handle error
+        alert("Atempt failed: " + error.message);
+      }
+    };
 
     const handleSignup = async () => {
       try {
@@ -177,6 +210,32 @@ function handleLoginClick(event) {
       </Modal>
 
 
+      <Modal 
+        show={showModalPass} 
+        onHide={() => {setShowModalPass(false) }} 
+        centered
+        backdrop="static"
+        keyboard={false}
+      >
+        <Modal.Header className="justify-content-center" closeButton>
+          <Modal.Title>Forgot Password</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="justify-content-center">
+          <p>Enter your email here:</p>
+          <Form.Control 
+            type="text" 
+            placeholder="example@email.com"
+            value={forgotPassEmail}
+            onChange={handleForgotPassEmailChange}
+          />
+        </Modal.Body>
+        <Modal.Footer className="justify-content-center">
+          <Button variant="primary" onClick={() => {forgotPassword()}}>
+            Submit
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
       {action==="Login"? (
         //Login Form ----------------------------------------------------------------
       <div className = 'form_container p-5 rounded bg-white'>
@@ -201,6 +260,12 @@ function handleLoginClick(event) {
               event.preventDefault();
               setAction("Register")
               }}>Sign Up</a>
+          </p>
+          <p className='text-right mt-2'>
+            <a href='#' onClick={(event) => {
+                event.preventDefault(); // Prevent the default anchor link behavior
+                setShowModalPass(true);    // Open the modal
+            }}>forgot password?</a>
           </p>
           
         </form>
