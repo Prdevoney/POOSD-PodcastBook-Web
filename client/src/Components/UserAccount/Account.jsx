@@ -217,6 +217,7 @@ function Account() {
             alert('Password updated successfully');
             // Handle successful update
           } else {
+            alert(data.error);
             console.error(data.error);
           }
         })

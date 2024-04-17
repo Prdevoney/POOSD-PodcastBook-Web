@@ -3,6 +3,7 @@ import LoginSignup from './Components/LoginSignup/LoginSignup';
 import ExplorePodcasts from './Components/Explore/ExplorePodcasts';
 import Account from './Components/UserAccount/Account';
 import PodcastReview from './Components/Podcast/PodcastReview';
+import MyFriends from './Components/Friends/MyFriends';
 // new added ->
 import React, {useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -66,6 +67,8 @@ function Main() {
               <Nav.Link as={NavLink} to="/explore-podcasts" style={{ textDecoration: location.pathname === '/explore-podcasts' ? 'underline' : 'none', color: location.pathname === '/explore-podcasts' ? 'white' : 'inherit', fontSize: '20px', paddingRight: '30px' }}>Explore Podcasts</Nav.Link>
               <Navbar.Text className ="d-none d-sm-inline" style={{ color: 'inherit', fontSize: '20px', fontWeight: 'bold' , paddingRight: '30px'}}> | </Navbar.Text>
               <Nav.Link as={NavLink} to="/account" style={{ textDecoration: location.pathname === '/account' ? 'underline' : 'none', color: location.pathname === '/account' ? 'white' : 'inherit', fontSize: '20px' ,paddingRight: '30px' }}>Account</Nav.Link>
+              <Navbar.Text className ="d-none d-sm-inline" style={{ color: 'inherit', fontSize: '20px', fontWeight: 'bold' , paddingRight: '30px'}}> | </Navbar.Text>
+              <Nav.Link as={NavLink} to="/my-podcast-friends" style={{ textDecoration: location.pathname === '/my-podcast-friends' ? 'underline' : 'none', color: location.pathname === '/my-podcast-friends' ? 'white' : 'inherit', fontSize: '20px' ,paddingRight: '30px' }}>Friends</Nav.Link>
             </Nav>
               
 {/*     Just commented out the search bar for now. my-2 my-lg-0
@@ -113,6 +116,7 @@ function App() {
         <Route path="/explore-podcasts" element={<ExplorePodcasts />} />
         <Route path="/account" element={<Account/>}/>
         <Route path="/review-podcast" element={<PodcastReview/>}/>
+        <Route path="/my-podcast-friends" element={<MyFriends/>}/>
       </Routes>
       </UserContext.Provider>
     </Router>
