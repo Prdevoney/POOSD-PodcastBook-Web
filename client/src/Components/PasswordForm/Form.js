@@ -6,7 +6,11 @@ import axios from "axios";
 import './Form.css'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-// const baseurl = 'https://podcastd-test.azurewebsites.net/api'
+
+/* WHEN WE DEPLOY SWITCH TO THIS BASEURL */
+// const baseurl = 'https://mypodcastbook.com/api'
+
+/* THIS IS FOR LOCAL TESTING */
 const baseurl = 'http://localhost:5000/api'
 
 

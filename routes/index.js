@@ -238,7 +238,10 @@ router.post('/forgotPassword', async (req, res) => {
         from: 'security@mypodcastbook.com',
         to: user.Email,
         subject: "Password Reset",
+        // THIS IS FOR LOCAL DEVELOPMENT.
         html: generatePasswordResetTemplate(`http://localhost:3000/resetPassword?token=${ranbytes}&id=${user._id}`),
+        /*WHEN WE DEPLOY SWITCH TO THIS URL: */
+        // html: generatePasswordResetTemplate(`https://mypodcastbook.com/resetPassword?token=${ranbytes}&id=${user._id}`),
     });
 
     res.json({success: true, message: 'Password reset link is sent to your email.'});
