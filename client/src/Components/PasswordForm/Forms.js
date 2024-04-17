@@ -68,13 +68,13 @@ export default function Form() {
             const { data } = await axios.post(`${baseurl}/resetPassword?token=${token}&id=${id}`,{Password:  password });
             console.log("why");
             //console.log(data);
-            
+
             if (data.success) {
                 navigate('/resetPassword');
                 setSuccess(true);
             }
         } catch (error) {
-    
+
             if (error?.response?.data) {
                 const { data } = error.response;
                 if (!data.success) return setError(data.error);
@@ -85,7 +85,7 @@ export default function Form() {
     }
 
     if (success) return <div className="max-w-screen-sm m-auto pt-40">
-    <h1 className="text-center text-3xl text-gray-500 mb-3">Password Reset Successful</h1>
+        <h1 className="text-center text-3xl text-gray-500 mb-3">Password Reset Successful</h1>
     </div>
 
 
@@ -95,23 +95,31 @@ export default function Form() {
 
     return (
 
-        <div className="container-fluid d-flex flex-column justify-content-center align-items-center vh-100">
-            <h1 className="ResetPass">Reset Password</h1>
+        <div className="container-fluid col-md-6 mx-auto mt-3 'text-center mb-3 ">
+            <h1 className='text-center mb-3'>Reset Password</h1>
             <form onSubmit={handleSubmit} className="shadow w-full rounded-lg p-10">
                 {error && (<p className="text-center p-2 mb-3 pg-red-500 text-white">{error}</p>
                 )}
-                <div className="container-fluid d-flex justify-content-center">
-                    <input type="password" placeholder='**********' name='password' onChange={handleOnChange} className="px-3 text-lg h-10 w-full border-gray-500 border-2 rounded" />
-                    <input type="password" placeholder='**********' name='confirmpassword' onChange={handleOnChange} className="px-3 text-lg h-10 w-full border-gray-500 border-2 rounded" />
-                    <input type="submit" value="Reset password" className="btn btn-primary btn-sm text-black rounded" />
+
+                <div className='form-group was-validated mb-2'>
+                    <label className='form-label'></label>
+                    <input type="password" placeholder="Password" name='password' onChange={handleOnChange} className='form-control' required></input>
+                    <div className="invalid-feedback">Please enter your password</div>
                 </div>
 
+                <div className='form-group was-validated mb-2'>
+                    <label className='form-label'></label>
+                    <input type="password" placeholder="Confirm Password" name='confirmpassword' onChange={handleOnChange} className='form-control' required></input>
+                    <div className="invalid-feedback">Please confirm your password</div>
+                </div>
+
+                <div className = 'd-grid'>
+              <input type = 'submit' value='Reset password'  className = 'btn btn-primary'/>
+            </div>
             </form>
         </div>
 
-        
 
-        
 
     )
 }
