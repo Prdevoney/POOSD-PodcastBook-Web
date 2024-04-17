@@ -7,7 +7,6 @@
         "dev": "nodemon ./bin/www",
         "build": "cd client && npm install && npm run build",
         "postinstall": "npm run build"
-   
     },
     "jest": {
         "testEnvironment": "node"

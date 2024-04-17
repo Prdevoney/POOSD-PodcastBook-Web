@@ -53,7 +53,7 @@ export default function Form() {
     }
 
     const handleSubmit = async(e)  => {
-        e.preventDefualt()
+        e.preventDefault()
         const { password, confirmpassword } = newpassword
         if (password.trim().length < 8 || password.trim().length > 20) {
             return setError('Password must be 8 to 20 characters long!');
@@ -63,8 +63,9 @@ export default function Form() {
         }
 
         try {
-
-            const { data } = await axios.post(`${baseurl}/resetPassword?token=${token}&id=${id}`, {password});
+            console.log("this is my password:");
+            console.log(password);
+            const { data } = await axios.post(`${baseurl}/resetPassword?token=${token}&id=${id}`,{Password:  password });
             console.log("why");
             //console.log(data);
             
@@ -76,7 +77,7 @@ export default function Form() {
     
             if (error?.response?.data) {
                 const { data } = error.response;
-                if (!data.success) return setInvalidUser(data.error);
+                if (!data.success) return setError(data.error);
                 return console.log(error.response.data);
             }
             console.log(error.response.data);
