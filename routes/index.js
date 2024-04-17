@@ -179,8 +179,6 @@ router.post('/verifyEmail', async (req, res) => {
             return res.status(400).json({ error: "Please provide valid token" });
         }
 
-
-
         await collection.findOneAndUpdate({ _id: user._id }, { $set: { verified: true } });
         await db.collection('VerificationTokens').findOneAndDelete({ owner: user._id });
 
