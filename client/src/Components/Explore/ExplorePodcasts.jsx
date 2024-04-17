@@ -43,12 +43,27 @@ const ExplorePodcasts =() =>{
   const handleTypeChange = (e) => {
     setSearchType(e.target.value);
   };
+const handleCurrentEpisode = (currEpisode) => {
+    console.log("Episode data received:", currEpisode);
 
-  const handleCurrentEpisode = (currEpisode) => {
-     console.log("Episode data received:", currEpisode);
+    const date = new Date(currEpisode.pub_date_ms);
+    const formattedDate = date.toLocaleDateString("en-US", {
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    }) + ' ' + date.toLocaleTimeString("en-US", {
+        hour: '2-digit', 
+        minute: '2-digit' 
+    });
 
-      setCurrentEpisode(currEpisode);
-      setShowModal(true);
+    const updatedEpisode = {
+        ...currEpisode,
+        pub_date_ms: formattedDate 
+    };
+
+    setCurrentEpisode(updatedEpisode);
+    setShowModal(true);
   };
 
   const handleReview = (data) => {
@@ -169,7 +184,8 @@ const ExplorePodcasts =() =>{
               <source src={currentEpisode.audio} type="audio/mpeg" />
               Your browser does not support the audio element.
             </audio>
-            
+            <h5><br></br>Publish Date: <br></br></h5>
+            <p>{currentEpisode.pub_date_ms}</p>
             <h5><br></br>Description:</h5>
             <p dangerouslySetInnerHTML={{ __html: currentEpisode.description || currentEpisode.description_highlighted }}></p>
             <Modal.Footer>
@@ -249,7 +265,7 @@ const ExplorePodcasts =() =>{
                             <Image src={podcast.image} alt="podcast thumbnail" className="img-thumbnail mb-3"/>
                             <h5>Podcast: {podcast.title_original}</h5>
                             <p dangerouslySetInnerHTML={{ __html: podcast.description_highlighted.length > 150 ? podcast.description_highlighted.substring(0, 150) + '...' : podcast.description_highlighted }}></p>
-                            <Button variant="outline-primary" className="mt-auto" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
+                            <Button variant="outline-primary" className="mt-auto" onClick={() => getEpisode(podcast.id)}>Listen to Latest Episode</Button>
                             <Button className="mt-2" variant="primary" onClick={() => handleReview(podcast)}>Review Podcast</Button>
                           </Card>
                         </Col>
@@ -306,7 +322,7 @@ const ExplorePodcasts =() =>{
                             <h5>Podcast: {podcast.title}</h5>
                             <p>Language: {podcast.language}</p>
                             <p dangerouslySetInnerHTML={{ __html: podcast.description.length > 150 ? podcast.description.substring(0, 150) + '...' : podcast.description }}></p>
-                            <Button variant="outline-primary" className="mt-auto" onClick={() => getEpisode(podcast.id)}>Listen to an Episode</Button>
+                            <Button variant="outline-primary" className="mt-auto" onClick={() => getEpisode(podcast.id)}>Listen to Latest Episode</Button>
                             <Button className="mt-2" variant="primary" onClick={() => handleReview(podcast)}>Review this Podcast</Button>
                           </Card>
                         </Col>
