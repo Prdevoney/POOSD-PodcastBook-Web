@@ -113,6 +113,7 @@ function App() {
         <Route path="/explore-podcasts" element={<ExplorePodcasts />} />
         <Route path="/account" element={<Account/>}/>
         <Route path="/review-podcast" element={<PodcastReview/>}/>
+        <Route path="/resetPassword" element = {<Form/>} />
       </Routes>
       </UserContext.Provider>
     </Router>

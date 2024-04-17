@@ -215,9 +215,9 @@ router.post('/forgotPassword', async (req, res) => {
     }
 
     const token = await db.collection('ResetTokens').findOne({owner: user._id});
-    if (token) {
-        return res.status(400).json({ error: "For security reasons, you must wait 1 hour for a new link" });
-    }
+    // if (token) {
+    //     return res.status(400).json({ error: "For security reasons, you must wait 1 hour for a new link" });
+    // }
 
    const ranbytes = await createRandomBytes();
    const resetToken = {
