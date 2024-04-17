@@ -263,9 +263,10 @@ router.post('/resetPassword', isResetTokenValid, async(req, res) => {
         return res.status(400).json({ error: "User not found" });
     }
 
-
-    const isMatched = await bcrypt.compareSync(Password, user.Password);
+    console.log("This is my new password" ,Password, "and old pass", user.Password);
+    const isMatched = await bcrypt.compare(Password, user.Password);
     if (isMatched) {
+        console.log("I am the same password");
         return res.status(401).json({ error: "New password must be different" });
     }
 
@@ -284,7 +285,7 @@ router.post('/resetPassword', isResetTokenValid, async(req, res) => {
     await db.collection('ResetTokens').findOneAndDelete({owner: user._id});
 
     mailTransport().sendMail({
-        from: 'security@email.com',
+        from: 'security@mypodcastbook.com',
         to: user.Email,
         subject: "Password Reset Successfully",
         html: resetSuccessfullTemplate(),
