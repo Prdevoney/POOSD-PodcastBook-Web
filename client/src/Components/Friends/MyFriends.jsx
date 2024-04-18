@@ -12,9 +12,9 @@ function MyFriends() {
 
     // sets the username of the current user account
     const [username, setUsername] = useState('');
-    const [userReviews, setReviews] = useState([]);
+    // const [userReviews, setReviews] = useState([]);
 
-    const [rating, setRating] = useState(null);
+    // const [rating, setRating] = useState(null);
 
     const [following, setFollowing] = useState([]);
     const [followers, setFollowers] = useState([]);
@@ -48,7 +48,7 @@ function MyFriends() {
           setFriendReviews(data);
         })
         .catch(error => console.error('Error:', error));
-    }, []);
+    }, [UserID]);
 
     useEffect(() => {
       fetch('/api/getUserInfo', {
@@ -68,7 +68,7 @@ function MyFriends() {
           setFollowing(data.user.Following)
         })
         .catch(error => console.error('Error:', error));
-    }, []);
+    }, [UserID]);
 
 
 
@@ -226,11 +226,11 @@ function MyFriends() {
             .catch(error => console.error('Error:', error));
       };
 
-      const handleFollowSearchChange = (e) => {
-        setToggleFriendUsername(e.target.value);
-      };
+      // const handleFollowSearchChange = (e) => {
+      //   setToggleFriendUsername(e.target.value);
+      // };
 
-      const [toggleFriendUsername, setToggleFriendUsername] = useState('');
+      // const [toggleFriendUsername, setToggleFriendUsername] = useState('');
       const [friendingMessage, setFriendingMessage] = useState('');
 
       const fetchToggleFriend = async (friendID) => {
