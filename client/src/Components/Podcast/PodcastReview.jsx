@@ -19,12 +19,11 @@ function PodcastReview() {
     const [review, setReview] = useState('');
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    const numberOfReviews = 8;
 
     const [reviews, setReviews] = useState([]);
-    const [error, setError] = useState(null);
+    // const [error, setError] = useState(null);
 
-    const [userEmail, setEmail] = useState('');
+    // const [userEmail, setEmail] = useState('');
     const [username, setUsername] = useState('');
 
     const UserID = localStorage.getItem('UserID');
@@ -47,10 +46,10 @@ function PodcastReview() {
         .then(data => {
           console.log("User Info: " + data); 
           setUsername(data.user.Username)
-          setEmail(data.user.Email)
+          // setEmail(data.user.Email)
         })
         .catch(error => console.error('Error:', error));
-    }, []);
+    }, );
 
 
     const PostReview = async ({Podcast, Rating, Comment, Username, UserID}) => {
@@ -75,12 +74,12 @@ function PodcastReview() {
   
         const data = await response.json();
         setReviews(data.reviews);
-        setError(null);
+        // setError(null);
 
         window.location.reload();
       } catch (error) {
         console.error("Error fetching reviews:", error);
-        setError(error.message || "An error occurred while fetching reviews");
+        // setError(error.message || "An error occurred while fetching reviews");
       }
     }
     
@@ -104,16 +103,16 @@ function PodcastReview() {
           const data = await response.json();
           setReviews(data.reviews);
           //console.log(data.reviews);
-          setError(null);
+          // setError(null);
         } catch (error) {
           console.error("Error fetching reviews:", error);
-          setError(error.message || "An error occurred while fetching reviews");
+          // setError(error.message || "An error occurred while fetching reviews");
         }
       };
     
       useEffect(() => {
         fetchReviews();
-      }, []); // Re-fetch reviews if reviewData changes
+      }, ); // Re-fetch reviews if reviewData changes
 
     const renderReviews = () => {
         //console.log(reviews)
