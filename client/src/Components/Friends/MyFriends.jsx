@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Container, Stack, Form } from 'react-bootstrap';
+import { Button, Container, Stack, Form, ListGroup } from 'react-bootstrap';
 import {useState, useEffect} from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -75,16 +75,9 @@ function MyFriends() {
       // Following _______________________________________________________>
       const listofFollowing = () => {
         return currentFollowing.map((following, index) => (
-          <Row sm={2}key = {index}>
-          
-          <Container id="followerBoxes" className="border" style={{backgroundColor: 'blue', color: 'white'}}>
-            <Row> 
-              <Col>
-                <h2>{following}</h2>
-              </Col>
-            </Row>
-          </Container>
-          </Row>
+          <ListGroup.Item key={index}>{following}</ListGroup.Item>
+
+
         ));
       };
 
@@ -145,15 +138,7 @@ function MyFriends() {
 
       const listofFollowers = () => {
         return currentFollower.map((follower, index) => (
-          <Row sm={2} key = {index}>
-          <Container id="followerBoxes" className=" border" style={{backgroundColor: 'blue', color: 'white'}}>
-            <Row>
-              <Col lg={10}>
-                <h2>{follower}</h2>
-              </Col>
-            </Row>
-          </Container>
-          </Row>
+          <ListGroup.Item key={index}>{follower}</ListGroup.Item>
         ));
       };
       // End of Follower List ---------------------------------------------------->
@@ -332,11 +317,12 @@ function MyFriends() {
                 <Button variant="outline-light" onClick={() => fetchFriendID(2)}>Enter</Button>
               </Form>
               {friendingMessage && <p>{friendingMessage}</p>}
-            <h1 >Following:</h1>
-            {listofFollowing()}
-            <h1 >Followers:</h1>
-            {listofFollowers()}
-              
+            <ListGroup>
+              <ListGroup.Item variant="primary">Following: {following.length}</ListGroup.Item>
+              {listofFollowing()}
+              <ListGroup.Item variant="primary">Followers: {followers.length}</ListGroup.Item>
+              {listofFollowers()}
+            </ListGroup>
           </Stack>
         </Col>
 

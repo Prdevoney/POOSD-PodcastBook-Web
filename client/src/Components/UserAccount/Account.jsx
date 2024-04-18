@@ -67,7 +67,6 @@ function Account() {
       setRating(null);
     };
 
-    const handleClose = () => setShow(false);
     const [rating, setRating] = useState(null);
     const [hover, setHover] = useState(null);
     const [show, setShow] = useState(false);
