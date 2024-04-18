@@ -12,6 +12,10 @@ body {
 
 .navbar-container {
   min-height: 80px; /* Replace with the height you want */
+    margin-right: 0;
+    padding-right: 0;
+    width: 100%;
+    justify-content: stretch;
 }
 
 code {
