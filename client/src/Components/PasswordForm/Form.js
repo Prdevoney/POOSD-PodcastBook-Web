@@ -51,7 +51,7 @@ export default function Form() {
 
     useEffect(() => {
         verifyToken();
-    }, []);
+    }, );
 
     const handleOnChange = ({ target }) => {
         const { name, value } = target;
