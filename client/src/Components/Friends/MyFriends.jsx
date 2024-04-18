@@ -41,7 +41,7 @@ function MyFriends() {
           return null;
         }
         return followers.map((reviewItem, index) => (
-            <Container key={index} id="reviewBoxes" className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white'}}>   
+            <Container key={index} id="reviewBoxes" className="my-3 p-3 border" style={{backgroundColor: '#41a0ff', color: 'white'}}>   
             <Row>
               <Col lg={10}>
                 <h2>{reviewItem.Username}</h2>
@@ -95,7 +95,6 @@ function MyFriends() {
         <Col sm={3} className="d-flex justify-content-center" style={{borderColor: 'black' ,borderRight: '2px solid black' }}>
           <Stack gap={5} className ="text-center">
             <h1>Hello, {username}</h1>
-            <Button className = "d-inline-block align-self-center"  variant="primary">Friends Password</Button>
           </Stack>
         </Col>
 

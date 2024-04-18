@@ -189,7 +189,7 @@ const handleCurrentEpisode = (currEpisode) => {
             <h5><br></br>Description:</h5>
             <p dangerouslySetInnerHTML={{ __html: currentEpisode.description || currentEpisode.description_highlighted }}></p>
             <Modal.Footer>
-              <Button className="mt-2" variant="primary" onClick={() => handleReview(currentEpisode)}>Review this Episode</Button>
+              <Button className="mt-2" variant="primary" style ={{backgroundColor: '#41a0ff'}} onClick={() => handleReview(currentEpisode)}>Review this Episode</Button>
             </Modal.Footer>
 
           </div>
@@ -222,12 +222,6 @@ const handleCurrentEpisode = (currEpisode) => {
         </Row>
 
         <Form className="d-flex mb-4" onSubmit={(e) => e.preventDefault()} >
-          
-          <Form.Select className = "me-3" variant="primary" style={{width: '110px'}} aria-label="Default select example" value={searchType} onChange={handleTypeChange}>
-            <option value="podcast">Podcast</option>
-            <option value="episode">Episode</option>
-          </Form.Select>
-
           <Form.Control
             type="search"
             placeholder="Search"
@@ -263,9 +257,8 @@ const handleCurrentEpisode = (currEpisode) => {
                         <Col xs={12} md={6} lg={4} xxl={3} key={index} className="mb-3 d-flex justify-content-center">
                           <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3 d-flex flex-column">
                             <Image src={podcast.image} alt="podcast thumbnail" className="img-thumbnail mb-3"/>
-                            <h5>Podcast: {podcast.title_original}</h5>
+                            <h5>{podcast.title_original}</h5>
                             <p dangerouslySetInnerHTML={{ __html: podcast.description_highlighted.length > 150 ? podcast.description_highlighted.substring(0, 150) + '...' : podcast.description_highlighted }}></p>
-                            <Button variant="outline-primary" className="mt-auto" onClick={() => getEpisode(podcast.id)}>Listen to Latest Episode</Button>
                             <Button className="mt-2" variant="primary" onClick={() => handleReview(podcast)}>Review Podcast</Button>
                           </Card>
                         </Col>
@@ -292,7 +285,6 @@ const handleCurrentEpisode = (currEpisode) => {
                               <Image src={episode.image} alt="episode thumbnail" className="img-thumbnail mb-3"/>
                               <h5>Episode: {episode.title_original}</h5>
                               <p dangerouslySetInnerHTML={{ __html: episode.description_highlighted.length > 150 ? episode.description_highlighted.substring(0, 150) + '...': episode.description_highlighted }}></p>
-                              <Button variant="outline-primary" className="mt-auto" onClick={() => handleCurrentEpisode(episode)}>Play Episode</Button>
                               <Button className="mt-2" variant="primary" onClick={() => handleReview(episode)}>Review Episode</Button>
 
                             </Card>
@@ -319,11 +311,10 @@ const handleCurrentEpisode = (currEpisode) => {
                         <Col xs={12} md={6} lg={4} xxl={3} key={index} className="mb-3 d-flex justify-content-center">
                           <Card key={index} style={{ width: '18rem' }} className="p-3 mb-3 d-flex flex-column">
                             <img src={podcast.image} alt="Podcast Cover" className="img-thumbnail mb-3" />
-                            <h5>Podcast: {podcast.title}</h5>
+                            <h5>{podcast.title}</h5>
                             <p>Language: {podcast.language}</p>
                             <p dangerouslySetInnerHTML={{ __html: podcast.description.length > 150 ? podcast.description.substring(0, 150) + '...' : podcast.description }}></p>
-                            <Button variant="outline-primary" className="mt-auto" onClick={() => getEpisode(podcast.id)}>Listen to Latest Episode</Button>
-                            <Button className="mt-2" variant="primary" onClick={() => handleReview(podcast)}>Review this Podcast</Button>
+                            <Button className="mt-2" variant="primary" style ={{backgroundColor: '#41a0ff'}} onClick={() => handleReview(podcast)}>Review this Podcast</Button>
                           </Card>
                         </Col>
                     ))}

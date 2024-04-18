@@ -6,6 +6,7 @@ import { Button, Container, Modal, Form } from 'react-bootstrap';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Card from 'react-bootstrap/Card';
 import './PodcastReviewStyle.css';
 
 function PodcastReview() {
@@ -120,9 +121,9 @@ function PodcastReview() {
         return(
         <Row>
                 {reviews ? reviews.map((reviews, index) => (
-                <Container key={index-1} id="reviewBoxes" className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white', textAlign: 'center'}}> 
-                        <h5>{reviews.Username}</h5>
-                        <p>{reviews.Comment}</p>
+                <Col xs={6} md={5} lg={4} xxl={3} key={index} className="mb-3 d-flex justify-content-center"> 
+                <Card key={index-1} id="reviewBoxes" className="my-3 p-3 border" style={{backgroundColor: '#41a0ff', color: 'white', textAlign: 'center', width: '50rem'}}>
+                        <Card.Title>{reviews.Username}</Card.Title>
 
                         <Container id='starBox' className = "my-1 p-1 ms-auto" style={{color: 'black'}}>
                             {[...Array(5)].map((star, index) => {
@@ -143,7 +144,9 @@ function PodcastReview() {
                             })}
                             </Container>
 
-                </Container>
+                            <Card.Text>{reviews.Comment}</Card.Text>
+                </Card>
+                </Col>
 
                 )) : null}
         </Row>
@@ -154,7 +157,7 @@ function PodcastReview() {
 
         <>
         
-            <Container className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white'}}>
+            <Container className="my-3 p-3 border" style={{backgroundColor: 'darkblue', color: 'white'}}>
                 <Row>
                     <Col sm={4}>
                         <Image src= {reviewData.image} thumbnail />
@@ -165,7 +168,7 @@ function PodcastReview() {
                             <h1>{reviewData.title}</h1>
                             </Col>
                             <Col sm={3} className ='ml-auto'>
-                              <Button variant="primary" onClick={handleShow}>Add Review</Button>
+                              <Button variant="primary" style ={{backgroundColor: '#41a0ff'}} onClick={handleShow}>Add Review</Button>
                             </Col>
                         </Row>
                         <Row>
@@ -222,7 +225,7 @@ function PodcastReview() {
             </Button>
             
             
-            <Button variant="primary" onClick={() => PostReview({Podcast:reviewData.title, Rating: rating, Comment: review, Username: username, UserID: UserID} )}>
+            <Button variant="primary" style ={{backgroundColor: '#41a0ff'}} onClick={() => PostReview({Podcast:reviewData.title, Rating: rating, Comment: review, Username: username, UserID: UserID} )}>
                 Post Review
             </Button>
             </Modal.Footer>

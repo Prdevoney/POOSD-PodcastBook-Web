@@ -7,6 +7,7 @@ input[type=radio] {
 }
 
 #reviewBoxes {
-  background: linear-gradient(to bottom, rgb(52, 120, 189), rgb(120, 151, 161));
+  /*background: linear-gradient(to bottom, rgb(52, 120, 189), rgb(120, 151, 161));*/
+  background-color: #41a0ff;
   color: white;
 }

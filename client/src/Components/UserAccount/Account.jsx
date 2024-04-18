@@ -147,7 +147,7 @@ function Account() {
           return null;
         }
         return userReviews.map((reviewItem, index) => (
-            <Container key={index} id="reviewBoxes" className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white'}}>   
+            <Container key={index} id="reviewBoxes" className="my-3 p-3 border" style ={{backgroundColor: '#41a0ff', color: 'white'}}>   
             <Row>
               <Col lg={10}>
                 <h1>{reviewItem.Podcast}</h1>
@@ -174,7 +174,7 @@ function Account() {
                 <Row className = "mr-3 mb-3">
                   <Button variant="info" onClick={() => 
                   handlePopup(reviewItem._id, reviewItem.Podcast, reviewItem.Rating, reviewItem.Comment)
-                  } style= {{maxWidth: '150px'}}>Edit Review</Button>
+                  } style= {{backgroundColor: 'darkblue', color: 'white', maxWidth: '150px'}}>Edit Review</Button>
                 </Row>
                 <Row>
                   <Button variant="danger" onClick={() => 
@@ -281,7 +281,7 @@ function Account() {
           <Stack gap={5} className ="text-center">
             <h1>Hello, {username}</h1>
             <h6> Email: {userEmail} </h6>
-            <Button className = "d-inline-block align-self-center" onClick={handleShowEnterCurrentPasswordModal} variant="primary">Change Password</Button>
+            <Button className = "d-inline-block align-self-center" onClick={handleShowEnterCurrentPasswordModal} style={{backgroundColor : 'darkblue'}} variant="primary">Change Password</Button>
           </Stack>
 
           <Modal show = {enterCurrentPasswordModal} onHide = {handleCloseEnterCurrentPasswordModal} centered>
