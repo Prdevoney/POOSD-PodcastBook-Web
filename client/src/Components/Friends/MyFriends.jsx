@@ -272,7 +272,7 @@ function MyFriends() {
                   {/* <Icon path={mdiAccount} size={3} color="black" /> */}
                 {/* </Image> */}
                 <h2>{reviewItem.Username}</h2>
-                <h3>{reviewItem.Podcast}</h3>
+                <h5>{reviewItem.Podcast}</h5>
                 <Container id='starBox' className = "my-1 p-1 ms-auto" style={{color: 'black'}}>
                                 {[...Array(reviewItem.Rating)].map((star, index) => {
                                     const currentRating = index + 1;
