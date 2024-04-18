@@ -15,10 +15,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 const { Client } = require('podcast-api');
 
 /* use for actuall data*/
-const API_KEY = 'e03f9deeb7fb4d8ea230d865bef7a67d';
+// const API_KEY = 'e03f9deeb7fb4d8ea230d865bef7a67d';
 
 /* use for testing */
-// const API_KEY = '';
+const API_KEY = '';
 
 
 const userId = localStorage.getItem('UserID');

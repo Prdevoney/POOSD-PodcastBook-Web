@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Container, Modal, Form, Stack } from 'react-bootstrap';
+import { Button, Container, Modal, Form, Stack, Card } from 'react-bootstrap';
 import {useState, useEffect} from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -24,7 +24,7 @@ function Account() {
 
     const UserID = localStorage.getItem('UserID');
     
-    console.log('hello user: ' + UserID);
+    // console.log('hello user: ' + UserID);
     
     const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
@@ -43,20 +43,29 @@ function Account() {
     const [username, setUsername] = useState('');
     const [userEmail, setEmail] = useState('');
     const [userReviews, setReviews] = useState([]);
-    console.log('email: ' + userEmail);
+    // console.log('email: ' + userEmail);
 
     const [popupData, setPopupData] = useState({podcastID: '', podcastTitle: '', rating: '', comment: ''});
     
     const handlePopup = (podcastID, podcastTitle, rating, comment) => {
       setPopupData({podcastID, podcastTitle, rating, comment});
       setNewReview(comment);
-      console.log("this is rating" + rating);
+      console.log("===== =====> ");
+      console.log("===== =====> ");
+      console.log("===== this is rating =====> " + rating);
+      console.log("===== this is rating =====> " + popupData.rating);
       setShow(true);
     };
 
     // useEffect(() => {
     //   console.log(popupData.rating);
     // }, [popupData.rating]);
+    // I want to to also set rating to null when the modal closes
+    const handleEditClose = () => 
+    {
+      setShow(false);
+      setRating(null);
+    };
 
     const handleClose = () => setShow(false);
     const [rating, setRating] = useState(null);
@@ -155,51 +164,61 @@ function Account() {
           console.log('no reviews');
           return null;
         }
-        return userReviews.map((reviewItem, index) => (
-            <Container key={index} id="reviewBoxes" className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white'}}>   
-            <Row>
-              <Col lg={10}>
-                <h1>{reviewItem.Podcast}</h1>
+        return (
+        <Row>
+          {userReviews.map((reviewItem, index) => {
+            return (
+              // xs={12} md={12} lg={6} xxl={4}
+            <Col xs={12} sm={6} md={6} lg={6}   key={index} className="mb-3 d-flex justify-content-center">
+              <Card key={index} style={{ width: '100rem' }} className="p-3 mb-3 d-flex flex-column">
+                {/* <Image src={podcast.image} alt="podcast thumbnail" className="img-thumbnail mb-3"/> */}
+                <h5>{reviewItem.Podcast}</h5>
                 <Container id='starBox' className = "my-1 p-1 ms-auto" style={{color: 'black'}}>
-                                {[...Array(reviewItem.Rating)].map((star, index) => {
-                                    const currentRating = index + 1;
-                                    return (
-                                        <label key={index}>
-                                            <input type = "radio" 
-                                                name = "rating"
-                                                value={currentRating}
-                                            />
-                                            <FaStar id = 'star' 
-                                                size={10} 
-                                                color = {'yellow'}
-                                            /> 
-                                        </label>
-                                    ); 
-                                })}
-                                </Container>
+                                  {[...Array(reviewItem.Rating)].map((star, index) => {
+                                      const currentRating = index + 1;
+                                      return (
+                                          <label key={index}>
+                                              <input type = "radio" 
+                                                  name = "rating"
+                                                  value={currentRating}
+                                              />
+                                              <FaStar id = 'star' 
+                                                  size={20} 
+                                                  color = {'#FFD700'}
+                                              /> 
+                                          </label>
+                                      ); 
+                                  })}
+                </Container>
                 <p>{reviewItem.Comment}</p>
-              </Col>
-              <Col className=" d-flex justify-content-center flex-column">
-                <Row className = "mb-3">
-                  <Button variant="info" onClick={() => 
-                  handlePopup(reviewItem._id, reviewItem.Podcast, reviewItem.Rating, reviewItem.Comment)
-                  } style= {{maxWidth: '150px'}}>Edit Review</Button>
-                </Row>
                 <Row>
-                  <Button variant="danger" onClick={() => 
-                    {
-                      console.log(reviewItem._id);
-                      deleteReview(reviewItem._id);
-                      }} style= {{maxWidth: '150px'}}>Delete Review</Button>
+                  <Col xs={6} md={6} lg={6} xxl={6}  >
+                <Button variant="info" className="w-100" onClick={() => 
+                    handlePopup(reviewItem._id, reviewItem.Podcast, reviewItem.Rating, reviewItem.Comment)
+                    } style= {{color: 'white'}}>Edit</Button>
+                    </Col>
+                    <Col xs={6} md={6} lg={6} xxl={6} >
+                <Button variant="danger" className="w-100" onClick={() => 
+                      {
+                        console.log(reviewItem._id);
+                        deleteReview(reviewItem._id);
+                        }} style= {{color: 'white'}}>Delete</Button>
+                    </Col>
                 </Row>
-              </Col>
-
-            </Row>
-            
-          </Container>
-        ));
-
+                {/* <p dangerouslySetInnerHTML={{ __html: reviewItem.comment.length > 150 ? podcast.description_highlighted.substring(0, 150) + '...' : podcast.description_highlighted }}></p> */}
+                {/* <Button variant="outline-primary" className="mt-auto" onClick={() => getEpisode(podcast.id)}>Listen to Latest Episode</Button> */}
+                {/* <Button className="mt-2" variant="primary" onClick={() => handleReview(podcast)}>Review Podcast</Button> */}
+              </Card>
+            </Col>
+            );
+          })}
+       </Row>
+       );
+         
     };
+
+// ================== end of reviews ==================
+
 
     const changePassword = () => {
       // Check if new password and confirm password are the same
@@ -284,11 +303,11 @@ function Account() {
 
 
   return (
-    <>
+    <Container>
       <Row>
-        <Col sm={3} className="d-flex justify-content-center" style={{borderColor: 'black' ,borderRight: '2px solid black' }}>
+        <Col sm={3} className="mt-4 d-flex justify-content-center" style={{borderColor: 'black' ,borderRight: '2px solid black' }}>
           <Stack gap={5} className ="text-center">
-            <h1>Hello, {username}</h1>
+            <h1 style={{color: 'white'}}>Hello, {username}</h1>
             <h6> Email: {userEmail} </h6>
             <Button className = "d-inline-block align-self-center" onClick={handleShowEnterCurrentPasswordModal} variant="primary">Change Password</Button>
             <Button className = "d-inline-block align-self-center" onClick={handleLogout} variant="secondary">Logout</Button>
@@ -319,8 +338,8 @@ function Account() {
 
 
           <Modal show={showChangePasswordModal} onHide={handleCloseChangePasswordModal} centered>
-          <Modal.Header closeButton>
-            <Modal.Title>Change Password</Modal.Title>
+            <Modal.Header closeButton>
+              <Modal.Title>Change Password</Modal.Title>
             </Modal.Header>
             <Modal.Body>
               <Form className = 'needs-validation'>
@@ -337,74 +356,68 @@ function Account() {
               </Form>
             </Modal.Body>
             <Modal.Footer>
-            <Button variant="secondary" onClick={handleCloseChangePasswordModal}>
-                Cancel
-            </Button>
-            <Button variant="primary" onClick={()=> changePassword()}>
-                Reset Password
-            </Button>
+              <Button variant="secondary" onClick={handleCloseChangePasswordModal}> Cancel </Button>
+              <Button variant="primary" onClick={()=> changePassword()}> Reset Password </Button>
             </Modal.Footer>
           </Modal>
         </Col>
+        
 
-
-          <Col sm={8} className="border-right">
-            {renderReviews()}
-          </Col> 
-      </Row>
-      <Modal show={show} onHide={handleClose} centered>
+        <Col sm={9} className="mt-4 d justify-content-center">
+          {renderReviews()}
+              
+          <Modal show={show} onHide={handleEditClose} centered>
             <Modal.Header closeButton>
             <Modal.Title>Edit Review for {popupData.podcastTitle}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Row>
-                    <Col>
-                        <h6>Rating:</h6>
-                    </Col>
-                    <Col sm='true'>
-                        <Container id='starBox' className = "my-2 p-2" style={{backgroundColor: 'white', color: 'black'}}>
-                            {[...Array(5)].map((star, index) => {
-                                const currentRating = index + 1;
-                                return (
-                                    <label key = {index}>
-                                        <input type = "radio" 
-                                            name = "rating"
-                                            value={popupData.rating}
-                                            onChange={() => setRating(currentRating)}
-                                            // checked = {currentRating === popupData.rating}
-                                        />
+              <Row>
+                <Col>
+                  <h6>Rating: {popupData.rating}</h6>
+                </Col>
+                <Col sm='true'>
+                  <Container id='starBox' className = "my-2 p-2" style={{backgroundColor: 'white', color: 'black'}}>
+                    {[...Array(5)].map((star, index) => {
+                      const currentRating = index + 1;
+                      return (
+                        <label key = {index}>
+                          <input type = "radio" 
+                              name = "rating"
+                              value={popupData.rating}
+                              onChange={() => setRating(currentRating)}
+                              // checked = {popupData.rating}
+                          />
 
-                                        <FaStar id ='star' 
-                                            size={50} 
-                                            color={currentRating <= (hover || rating) ? "#ffc107" : "#e4e5e9"} 
-                                            onMouseEnter={() => setHover(currentRating)}
-                                            onMouseLeave={() => setHover(null)}
-                                        /> 
-                                    </label>
-                                ); 
-                            })}
-                        </Container>
-                    </Col>
-                    <p> Your rating is {rating} </p>
-
-                </Row>
-            <Form>
-                <Form.Group controlId="review">
-                <Form.Control as="textarea" rows={3} value={newReview} onChange={handleInputChange} />
-                </Form.Group>
-            </Form>
+                          <FaStar id ='star' 
+                              size={50} 
+                              
+                              // color={currentRating <= popupData.rating ? "#FFD700" : "#e4e5e9"} 
+                              // color={currentRating <= (hover || rating) ? "#FFD700" : "#e4e5e9"} 
+                              color={currentRating <= (hover || rating || popupData.rating) ? "#FFD700" : "#e4e5e9"}
+                              onMouseEnter={() => setHover(currentRating)}
+                              onMouseLeave={() => setHover(null)}
+                          /> 
+                        </label>
+                      ); 
+                    })}
+                  </Container>
+                </Col>
+                <p> Your rating is {rating} </p>
+              </Row>
+              <Form>
+                  <Form.Group controlId="review">
+                    <Form.Control as="textarea" rows={3} value={newReview} onChange={handleInputChange} />
+                  </Form.Group>
+              </Form>
             </Modal.Body>
             <Modal.Footer>
-            <Button variant="secondary" onClick={handleClose}>
-                Cancel
-            </Button>
-            <Button variant="primary" onClick={()=> updateReview(rating)}>
-                Post Review
-            </Button>
+              <Button variant="secondary" onClick={handleEditClose}> Cancel </Button>
+              <Button variant="primary" onClick={()=> updateReview(rating)}> Post Review</Button>
             </Modal.Footer>
-      </Modal>
-
-    </>
+          </Modal>
+        </Col> 
+      </Row>
+    </Container>
   )
 }
 
