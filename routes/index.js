@@ -264,9 +264,10 @@ router.post('/resetPassword', isResetTokenValid, async(req, res) => {
         return res.status(400).json({ error: "User not found" });
     }
 
-
-    const isMatched = await bcrypt.compareSync(Password, user.Password);
+    console.log("This is my new password" ,Password, "and old pass", user.Password);
+    const isMatched = await bcrypt.compare(Password, user.Password);
     if (isMatched) {
+        console.log("I am the same password");
         return res.status(401).json({ error: "New password must be different" });
     }
 
@@ -391,6 +392,8 @@ router.post('/followUnfollowToggle', async (req, res) => {
             return res.status(404).json({ error: "User not found" });
         }
 
+        const us = new ObjectId(UserID);
+
         // Find the target user by targetUserID
         const targetUser = await collection.findOne({ _id: new ObjectId(targetUserID) });
 
@@ -399,21 +402,23 @@ router.post('/followUnfollowToggle', async (req, res) => {
             return res.status(404).json({ error: "Target user not found" });
         }
 
+        const targetUs = new ObjectId(targetUserID);
+
         // Check if the user is already following the target user
-        const isFollowing = user.Following.includes(targetUserID);
+        const isFollowing = user.Following.some(id => id.equals(targetUs));
 
         // If user is already following the target user, unfollow
         if (isFollowing) {
             // Remove the target user from the user's Following array
             await collection.updateOne(
                 { _id: new ObjectId(UserID) },
-                { $pull: { Following: targetUserID } }
+                { $pull: { Following: targetUs } }
             );
 
             // Remove the user from the target user's Followers array
             await collection.updateOne(
                 { _id: new ObjectId(targetUserID) },
-                { $pull: { Followers: UserID } }
+                { $pull: { Followers: us } }
             );
 
             // Respond with success message and updated following status
@@ -423,13 +428,13 @@ router.post('/followUnfollowToggle', async (req, res) => {
             // Add the target user to the user's Following array
             await collection.updateOne(
                 { _id: new ObjectId(UserID) },
-                { $addToSet: { Following: targetUserID } }
+                { $addToSet: { Following: targetUs } }
             );
 
             // Add the user to the target user's Followers array
             await collection.updateOne(
                 { _id: new ObjectId(targetUserID) },
-                { $addToSet: { Followers: UserID } }
+                { $addToSet: { Followers: us } }
             );
 
             // Respond with success message and updated following status
@@ -530,83 +535,83 @@ router.post('/getFollowing', async (req, res) => {
   // I.E FollowUser[MyUserID, MyTargetID]
   // follows the user by adding them from the users following array and to the targets followed array
 
-router.post('/FollowUser', async (req, res) => {
-    try {
-      const { UserID, targetUserID } = req.body;
+// router.post('/FollowUser', async (req, res) => {
+//     try {
+//       const { UserID, targetUserID } = req.body;
   
-      // Check for required fields
-      if ( !UserID || !targetUserID) {
-        return res.status(400).json({ error: "All fields are required" });
-      }
-  
-      
-      await client.connect();
-  
-      const db = client.db("Podcast");
-      const collection = db.collection('User');
-
-
-      const user = await collection.findOne({ _id: new ObjectId(UserID) });
-
-      const targetuser = await collection.findOne({ _id: new ObjectId(targetUserID) });
-
-      console.log("Searching for user", user);
-
-      console.log("Searching for target user", targetuser);
-
-      collection.updateOne({_id: new ObjectId(UserID)}, { $push: { Following: new ObjectId(targetUserID)}});
-
-      collection.updateOne({_id: new ObjectId(targetUserID)}, { $push: { Followers: new ObjectId(UserID)}});
-
-      // Respond with success message
-      res.status(201).json({ message: "Follow added successfully", user });
-    } catch (error) {
-      console.error("Error Following user:", error);
-      res.status(500).json({ error: "An error occurred while Following user" });
-    }
-  });
-
-  // Unfollowuser[My UserID, The TargetID i want to unfollow]
-  // If MyUserID = 65ef7003e62b8bf051c994c6
-  // MyTargetID = 65efa246e62b8bf051c994c7
-  // I.E UnFollowUser[MyUserID, MyTargetID]
-  // Unfollows the user by removing them from the users following array and from the targets followed array
-
-  router.post('/UnFollowUser', async (req, res) => {
-    try {
-      const { UserID, targetUserID } = req.body;
-  
-      // Check for required fields
-      if ( !UserID || !targetUserID) {
-        return res.status(400).json({ error: "All fields are required" });
-      }
+//       // Check for required fields
+//       if ( !UserID || !targetUserID) {
+//         return res.status(400).json({ error: "All fields are required" });
+//       }
   
       
-      await client.connect();
+//       await client.connect();
   
-      const db = client.db("Podcast");
-      const collection = db.collection('User');
+//       const db = client.db("Podcast");
+//       const collection = db.collection('User');
 
 
-      const user = await collection.findOne({ _id: new ObjectId(UserID) });
+//       const user = await collection.findOne({ _id: new ObjectId(UserID) });
 
-      const targetuser = await collection.findOne({ _id: new ObjectId(targetUserID) });
+//       const targetuser = await collection.findOne({ _id: new ObjectId(targetUserID) });
 
-      console.log("Searching for user", user);
+//       console.log("Searching for user", user);
 
-      console.log("Searching for target user", targetuser);
+//       console.log("Searching for target user", targetuser);
 
-      collection.updateOne({_id: new ObjectId(UserID)}, { $pull: { Following: new ObjectId(targetUserID)}});
+//       collection.updateOne({_id: new ObjectId(UserID)}, { $push: { Following: new ObjectId(targetUserID)}});
 
-      collection.updateOne({_id: new ObjectId(targetUserID)}, { $pull: { Followers: new ObjectId(UserID)}});
+//       collection.updateOne({_id: new ObjectId(targetUserID)}, { $push: { Followers: new ObjectId(UserID)}});
 
-      // Respond with success message
-      res.status(201).json({ message: "Unfollow successfully", user });
-    } catch (error) {
-      console.error("Error Following user:", error);
-      res.status(500).json({ error: "An error occurred while Following user" });
-    }
-  });
+//       // Respond with success message
+//       res.status(201).json({ message: "Follow added successfully", user });
+//     } catch (error) {
+//       console.error("Error Following user:", error);
+//       res.status(500).json({ error: "An error occurred while Following user" });
+//     }
+//   });
+
+//   // Unfollowuser[My UserID, The TargetID i want to unfollow]
+//   // If MyUserID = 65ef7003e62b8bf051c994c6
+//   // MyTargetID = 65efa246e62b8bf051c994c7
+//   // I.E UnFollowUser[MyUserID, MyTargetID]
+//   // Unfollows the user by removing them from the users following array and from the targets followed array
+
+//   router.post('/UnFollowUser', async (req, res) => {
+//     try {
+//       const { UserID, targetUserID } = req.body;
+  
+//       // Check for required fields
+//       if ( !UserID || !targetUserID) {
+//         return res.status(400).json({ error: "All fields are required" });
+//       }
+  
+      
+//       await client.connect();
+  
+//       const db = client.db("Podcast");
+//       const collection = db.collection('User');
+
+
+//       const user = await collection.findOne({ _id: new ObjectId(UserID) });
+
+//       const targetuser = await collection.findOne({ _id: new ObjectId(targetUserID) });
+
+//       console.log("Searching for user", user);
+
+//       console.log("Searching for target user", targetuser);
+
+//       collection.updateOne({_id: new ObjectId(UserID)}, { $pull: { Following: new ObjectId(targetUserID)}});
+
+//       collection.updateOne({_id: new ObjectId(targetUserID)}, { $pull: { Followers: new ObjectId(UserID)}});
+
+//       // Respond with success message
+//       res.status(201).json({ message: "Unfollow successfully", user });
+//     } catch (error) {
+//       console.error("Error Following user:", error);
+//       res.status(500).json({ error: "An error occurred while Following user" });
+//     }
+//   });
 
 router.post('/SearchUser', async (req, res) => {
     try {
@@ -634,7 +639,7 @@ router.post('/SearchUser', async (req, res) => {
     }
 });
 
-router.post('/getUserInfo',  async (req, res) => {
+router.post('/getUserInfo', async (req, res) => {
     try {
         // Extract UserID from request body
         const { UserID } = req.body;

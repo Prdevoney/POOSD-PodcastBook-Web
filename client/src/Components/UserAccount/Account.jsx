@@ -1,17 +1,16 @@
 import React from 'react'
-import { Button, Container, Modal, Form, Stack } from 'react-bootstrap';
-import {useState, useEffect} from 'react';
-import Image from 'react-bootstrap/Image';
+import { Button, Container, Stack } from 'react-bootstrap';
+// import {useState, useEffect} from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
-import './AccountStyle.css'
-import { useContext } from 'react';
-import { UserContext } from '../UserContext';
-import Podcast from 'podcast-api'
+import Modal from 'react-bootstrap/Modal'; 
+import Form from 'react-bootstrap/Form'; 
+
+import './AccountStyle.css';
 import {FaStar} from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
-
+import { useState, useEffect} from 'react';
 
 // import { useLocation } from 'react-router-dom';
 

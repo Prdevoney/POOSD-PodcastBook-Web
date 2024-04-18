@@ -1,7 +1,9 @@
 import './App.css';
+
 import LoginSignup from './Components/LoginSignup/LoginSignup';
 import ExplorePodcasts from './Components/Explore/ExplorePodcasts';
 import Account from './Components/UserAccount/Account';
+import Form from './Components/PasswordForm/Forms';
 import PodcastReview from './Components/Podcast/PodcastReview';
 import Forms from './Components/PasswordForm/Form';
 import MyFriends from './Components/Friends/MyFriends';
@@ -9,9 +11,7 @@ import MyFriends from './Components/Friends/MyFriends';
 import React, {useState} from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import {BrowserRouter as Router, Routes, Route, useLocation} from 'react-router-dom';
-// end of new added ->
 
-//added now: 
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
@@ -60,8 +60,8 @@ function Main() {
       )}
     </>
   )
-
 }
+
 function App() {
   const [UserID, setUserID] = useState(null);
 
@@ -75,6 +75,8 @@ function App() {
       <Routes>
         <Route exat path="/" element={<LoginSignup />} />
         <Route path="/explore-podcasts" element={<ExplorePodcasts />} />
+
+        <Route path="/resetPassword" element = {<Form/>} />
         <Route path="/account" element={<Account/>}/>
         <Route path="/review-podcast" element={<PodcastReview/>}/>
         <Route path="/resetPassword" element = {<Forms/>} />

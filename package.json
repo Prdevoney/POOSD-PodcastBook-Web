@@ -6,8 +6,7 @@
         "start": "node ./bin/www",
         "dev": "nodemon ./bin/www",
         "build": "cd client && npm install && npm run build",
-        "postinstall": "npm run build",
-        "test:watch": "npm run test -- --watch"
+        "postinstall": "npm run build"
     },
     "jest": {
         "testEnvironment": "node"
@@ -25,6 +24,7 @@
         "express": "^4.19.1",
         "express-validator": "^7.0.1",
         "http-errors": "~1.6.3",
+        "http-proxy-middleware": "^3.0.0",
         "jsonwebtoken": "^9.0.2",
         "mongodb": "^6.4.0",
         "mongoose": "^8.3.1",

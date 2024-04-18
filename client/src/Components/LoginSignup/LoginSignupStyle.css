@@ -1,15 +1,3 @@
-/* .wrapper {
-    height: 100vh;
-}
-
-.login {
-    width: 300px;
-    padding: 20px;
-    height: min-content;
-    border-radius: 5px;
-    background-color: #ffffff;
-    color: black
-} */
 
 .form_container {
     width: 30%;
@@ -34,113 +22,10 @@
 }
 
 
-/* 
-
-.container {
-    display: flex;
-    flex-direction: column;
-    width: 600px;
-    margin: auto;   
-    margin-top: 50px;
-    background-color: #ffffff; 
-}
-
-
-.header {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 9px;
+.background-image {
+    background-image: 'url(/HeroSectionExtension.webp)';
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
     width: 100%;
-    margin-top: 10px;
 }
-
-.text {
-    font-size:40px;
-    font-weight: 700;
-    color: #455ec4;
-}
-
-
-
-.inputs {
-    margin-top: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 25px;
-    align-items: center;
-}
-
-.form {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    margin-bottom: 20px;
-}
-
-.input {
-    display: flex;
-    align-items: center;
-    margin: auto;
-    margin-bottom: 5px;
-    width: 400px;
-    height: 50px;
-    background-color: #eaeaea;
-    border-radius: 6px;
-}
-
-.input input {
-    height: 30px;
-    width: 400px;
-    background: transparent;
-    border: none;
-    outline: none;
-    color: #797979;
-    font-size: 19px;
-}
-
-.submit-container{
-    display: flex;
-    gap: 30px;
-    margin: 25px auto;
-}
-
-.submit{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 220px;
-    height: 60px;
-    color: white;
-    background: #455ec4;
-    font-size: 20px;
-    font-weight: 700;   
-    cursor: pointer;
-}
-
-.gray{
-    background: #928f8f;
-    color: rgb(255, 255, 255)
-}
-
-.btn{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 120px;
-    height: 60px;
-    color: white;
-    background: #317db0;
-    border-radius: 50px;
-    font-size: 20px;
-    font-weight: 700;   
-    cursor: pointer;
-}
-
-.button {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
-    margin-left: 120px;
-}
- */

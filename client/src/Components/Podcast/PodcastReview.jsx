@@ -10,6 +10,7 @@ import './PodcastReviewStyle.css';
 
 function PodcastReview() {
     
+    
     const location = useLocation();
     const { reviewData } = location.state || {};
 
