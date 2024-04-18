@@ -6,6 +6,7 @@ import { Button, Container, Modal, Form } from 'react-bootstrap';
 import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
+import Card from 'react-bootstrap/Card';
 import './PodcastReviewStyle.css';
 
 function PodcastReview() {
@@ -117,13 +118,15 @@ function PodcastReview() {
     const renderReviews = () => {
         //console.log(reviews)
         return(
-        <Row>
+        <Container>
+            <Row className="justify-content-center">
                 {reviews ? reviews.map((reviews, index) => (
-                <Container key={index-1} id="reviewBoxes" className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white', textAlign: 'center'}}> 
-                        <h5>{reviews.Username}</h5>
-                        <p>{reviews.Comment}</p>
-
-                        <Container id='starBox' className = "my-1 p-1 ms-auto" style={{color: 'black'}}>
+                <Col key={index-1} xs={12}  lg={6} className="my-3 p-3 " > 
+                  <Card className="p-2">
+                    <Row>
+                      <Col xs={4} className="d-flex flex-column align-items-center my-3" style={{ borderRight: '1px solid #ccc' }}>
+                        <h5 className="text-center">{reviews.Username}</h5>
+                        <Container id='starBox' className = "d-flex justify-content-center align-items-center my-1 p-1" style={{color: 'black'}}>
                             {[...Array(5)].map((star, index) => {
                                 const currentRating = reviews.Rating;
                                 //console.log(currentRating);
@@ -134,26 +137,32 @@ function PodcastReview() {
                                             value={currentRating}
                                         />
                                         <FaStar id = 'star' 
-                                            size={30} 
+                                            size={20} 
                                             color = {index<currentRating ? 'yellow' : 'grey' }
                                         /> 
                                     </label>
                                 ); 
                             })}
-                            </Container>
-
-                </Container>
+                        </Container>
+                      </Col>
+                            <Col className="my-3">
+                              <p className="text-center">{reviews.Comment}</p>
+                            </Col>
+                        </Row>
+                  </Card>
+                </Col>
 
                 )) : null}
-        </Row>
+            </Row>
+        </Container>
         );
     };
 
     return (
 
         <>
-        
-            <Container className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white'}}>
+          <Container>
+            <Card className="my-3 p-3 border">
                 <Row>
                     <Col sm={4}>
                         <Image src= {reviewData.image} thumbnail />
@@ -163,17 +172,17 @@ function PodcastReview() {
                             <Col>
                             <h1>{reviewData.title}</h1>
                             </Col>
-                            <Col sm={3} className ='ml-auto'>
-                              <Button variant="primary" onClick={handleShow}>Add Review</Button>
-                            </Col>
                         </Row>
-                        <Row>
+                        <Row className="my-4">
                             <p>{reviewData.description}</p>
                         </Row>
+                        <Col sm={3} className ='ml-auto'>
+                          <Button variant="primary" onClick={handleShow}>Add Review</Button>
+                        </Col>
                     </Col>
                 </Row>
-            </Container>
-
+            </Card>
+          </Container>
         <Modal show={show} onHide={handleClose} centered>
             <Modal.Header closeButton>
             <Modal.Title>Add Review</Modal.Title>

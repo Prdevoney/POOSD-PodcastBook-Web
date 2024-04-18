@@ -14,11 +14,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const { Client } = require('podcast-api');
 
-/* use for actuall data*/
-const API_KEY = 'e03f9deeb7fb4d8ea230d865bef7a67d';
+/* use for actuall data Katrinas Key*/
+// const API_KEY = 'ed55f2a452784b3ab28f6df53c3177a9';
 
 /* use for testing */
-// const API_KEY = '';
+const API_KEY = '';
 
 
 const userId = localStorage.getItem('UserID');
@@ -266,7 +266,7 @@ const ExplorePodcasts =() =>{
                             <h5>Podcast: {podcast.title_original}</h5>
                             <p dangerouslySetInnerHTML={{ __html: podcast.description_highlighted.length > 150 ? podcast.description_highlighted.substring(0, 150) + '...' : podcast.description_highlighted }}></p>
                             {/* <Button variant="outline-primary" className="mt-auto" onClick={() => getEpisode(podcast.id)}>Listen to Latest Episode</Button> */}
-                            <Button className="mt-2" variant="primary" onClick={() => handleReview(podcast)}>Review Podcast</Button>
+                            <Button className="mt-auto" variant="primary" onClick={() => handleReview(podcast)}>Review Podcast</Button>
                           </Card>
                         </Col>
                       ))}
@@ -323,7 +323,7 @@ const ExplorePodcasts =() =>{
                             <p>Language: {podcast.language}</p>
                             <p dangerouslySetInnerHTML={{ __html: podcast.description.length > 150 ? podcast.description.substring(0, 150) + '...' : podcast.description }}></p>
                             {/* <Button variant="outline-primary" className="mt-auto" onClick={() => getEpisode(podcast.id)}>Listen to Latest Episode</Button> */}
-                            <Button className="mt-2" variant="primary" onClick={() => handleReview(podcast)}>Review this Podcast</Button>
+                            <Button className="mt-auto" variant="primary" onClick={() => handleReview(podcast)}>Review this Podcast</Button>
                           </Card>
                         </Col>
                     ))}
