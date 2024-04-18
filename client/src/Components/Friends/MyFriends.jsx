@@ -1,10 +1,12 @@
 import React from 'react'
-import { Button, Container, Stack, Form } from 'react-bootstrap';
+import { Button, Container, Stack, Form, ListGroup, Card} from 'react-bootstrap';
 import {useState, useEffect} from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import './FriendsStyle.css'
 import {FaStar} from 'react-icons/fa';
+// import Icon from '@mdi/react';
+// import { mdiAccount } from '@mdi/js';
 
 function MyFriends() {
     const UserID = localStorage.getItem('UserID');
@@ -75,16 +77,9 @@ function MyFriends() {
       // Following _______________________________________________________>
       const listofFollowing = () => {
         return currentFollowing.map((following, index) => (
-          <Row sm={2}key = {index}>
-          
-          <Container id="followerBoxes" className="border" style={{backgroundColor: 'blue', color: 'white'}}>
-            <Row> 
-              <Col>
-                <h2>{following}</h2>
-              </Col>
-            </Row>
-          </Container>
-          </Row>
+          <ListGroup.Item key={index}>{following}</ListGroup.Item>
+
+
         ));
       };
 
@@ -145,15 +140,7 @@ function MyFriends() {
 
       const listofFollowers = () => {
         return currentFollower.map((follower, index) => (
-          <Row sm={2} key = {index}>
-          <Container id="followerBoxes" className=" border" style={{backgroundColor: 'blue', color: 'white'}}>
-            <Row>
-              <Col lg={10}>
-                <h2>{follower}</h2>
-              </Col>
-            </Row>
-          </Container>
-          </Row>
+          <ListGroup.Item key={index}>{follower}</ListGroup.Item>
         ));
       };
       // End of Follower List ---------------------------------------------------->
@@ -174,24 +161,26 @@ function MyFriends() {
             if (usage === 1){
               if (data.length === 0){
                 console.log('User not found');
-                setErrorMessage('!User not found!');
+                setErrorMessage('User not found!');
                 return;
               }
+              // For getting id of the person you want reviews
               const friendID = data[0]._id;
               setSearchedFriendID(data[0]._id);
               if (searchedFriendUsername === data[0].Username){
-                setFriendingMessage('');
+                setErrorMessage('');
                 fetchFriendReviews(friendID);
               } else {
                 console.log('User not found');
-                setErrorMessage('!User not found!');
+                setErrorMessage('User not found!');
               }
             } else if (usage === 2){
               if (data.length === 0){
                 console.log('User not found');
-                setFriendingMessage('!User not found!');
+                setFriendingMessage('User not found!');
                 return;
               }
+              // For gettiing the id of the user you want to follow
               const friendID = data[0]._id;
               setSearchedFriendID(data[0]._id);
               if (searchedFriendUsername === data[0].Username){
@@ -199,7 +188,7 @@ function MyFriends() {
                 fetchToggleFriend(friendID);
               } else {
                 console.log('User not found');
-                setFriendingMessage('!User not found!');
+                setFriendingMessage('User not found!');
               }
             }
             
@@ -254,7 +243,7 @@ function MyFriends() {
 
           console.log(data.message);
           window.location.reload();
-          setFriendingMessage(data.message)
+          // setFriendingMessage(data.message)
         } catch (error) {
           setFriendingMessage(error.message);
           console.error('Error:', error);
@@ -272,12 +261,18 @@ function MyFriends() {
           console.log('no reviews');
           return null;
         }
-        return friendReviews.map((reviewItem, index) => (
-            <Container lg={3} key={index} id="reviewBoxes" className="my-3 p-3 border" style={{backgroundColor: 'white', color: 'black'}}>   
-            <Row>
-              <Col lg={10}>
+        return (
+        <Row className= "mt-4">
+          {friendReviews.map((reviewItem, index) => {
+          return (
+            // <Container key={index} id="reviewBoxes" className="my-3 p-3 border" style={{backgroundColor: 'white', color: 'black'}}>   
+              <Col xs={12} sm={6} md={6} lg={6}   key={index} className="mb-3 d-flex justify-content-center">
+                <Card key={index} style={{ border: '1px solid black',width: '100rem' }}className="p-3 mb-3 d-flex flex-column">
+                {/* <Image> */}
+                  {/* <Icon path={mdiAccount} size={3} color="black" /> */}
+                {/* </Image> */}
                 <h2>{reviewItem.Username}</h2>
-                <h3>{reviewItem.Podcast}</h3>
+                <h5>{reviewItem.Podcast}</h5>
                 <Container id='starBox' className = "my-1 p-1 ms-auto" style={{color: 'black'}}>
                                 {[...Array(reviewItem.Rating)].map((star, index) => {
                                     const currentRating = index + 1;
@@ -289,18 +284,19 @@ function MyFriends() {
                                             />
                                             <FaStar id = 'star' 
                                                 size={15} 
-                                                color = {'yellow'}
+                                                color = {'#FFD700'}
                                             /> 
                                         </label>
                                     ); 
                                 })}
                                 </Container>
                 <p>{reviewItem.Comment}</p>
+                </Card>
               </Col>
-            </Row>
-          </Container>
-        ));
-
+            );
+          })}
+        </Row>
+        );
     };
     // end of renderReviews ===============================================>
 
@@ -308,16 +304,18 @@ function MyFriends() {
 
 
   return (
-    <>
-      <Row>
+    // <Container>
+      <Row classNamme ="justify-content-center align-items-center">
         <Col sm={3} className="d-flex justify-content-center" style={{borderColor: 'black' ,borderRight: '2px solid black' }}>
-          <Stack gap={5} className ="text-center">
-            <h1>Hello, {username} these are your friends!</h1>
-            <Form className="d-flex my-4" onSubmit={(e) => e.preventDefault()} >
+          <Stack gap={3} style={{marginLeft: '1rem'}}className ="text-center">
+            <h1 style={{color: 'white'}}>Hello, {username} these are your friends!</h1>
+            <div>
+            <p style={{marginBottom: '50',color: 'black'}}>Search for a friend by username:</p>
+            <Form className="d-flex justify-content-center align-items-center" onSubmit={(e) => e.preventDefault()} >
                 <Form.Control
                   type="search"
-                  placeholder="Follow/Unfollow a friend by username"
-                  className="me-2"
+                  placeholder="Enter a username"
+                  className="me-2 justify-content-center align-items-center"
                   aria-label="Search"
                   onChange={handleSearchChange}
                   onKeyDown={(event) => {
@@ -329,32 +327,34 @@ function MyFriends() {
                 />
                 <Button variant="outline-light" onClick={() => fetchFriendID(2)}>Enter</Button>
               </Form>
-              {friendingMessage && <p>{friendingMessage}</p>}
-            <h1 >Following:</h1>
-            {listofFollowing()}
-            <h1 >Followers:</h1>
-            {listofFollowers()}
-              
+              {friendingMessage && <p style={{fontWeight: 'bold' ,color: '#8B0000'}}>{friendingMessage}</p>}
+              </div>
+            <ListGroup style={{marginLeft: '2rem',width : '10rem' }}className ="justify-content-center ">
+              <ListGroup.Item variant="primary">Following: {following.length}</ListGroup.Item>
+              {listofFollowing()}
+              <ListGroup.Item variant="primary">Followers: {followers.length}</ListGroup.Item>
+              {listofFollowers()}
+            </ListGroup>
           </Stack>
         </Col>
 
 
-          <Col sm={8} className="border-right">
+          <Col sm={8} className="justify-content-center align-items-center border-right">
             <Row>
-              <h1> Your Friend Reviews</h1>
+              <h1 style={{color: 'white'}}> Your Friend Reviews</h1>
             </Row>
             <Row>
               <Form className="d-flex my-4" onSubmit={(e) => e.preventDefault()} >
                 <Form.Control
                   type="search"
-                  placeholder="Search for a friend's reviews by username"
+                  placeholder="Search for a user's reviews by username"
                   className="me-2"
                   aria-label="Search"
                   onChange={handleSearchChange}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter') {
                       event.preventDefault();
-                      fetchFriendID();
+                      fetchFriendID(1);
                     }
                   }}
                 />
@@ -363,8 +363,8 @@ function MyFriends() {
             </Row>
             <Row>
               <Col className="col-auto">
-                   {errorMessage && <p>{errorMessage}</p>}
-                  <Button variant="secondary" onClick={() => window.location.reload()}>Refresh All Friends' Reviews</Button>
+                   {errorMessage && <p style={{fontWeight: 'bold', color: '#8B0000'}}>{errorMessage}</p>}
+                  <Button variant="secondary" onClick={() => window.location.reload()}>Reset all friends' reviews</Button>
               </Col>
             </Row>
             <Row>
@@ -374,7 +374,7 @@ function MyFriends() {
           </Col> 
       </Row>
       
-    </>
+    // </Container>
   )
 }
 
