@@ -1,13 +1,9 @@
 import React from 'react'
 import { Button, Container, Modal, Form, Stack } from 'react-bootstrap';
 import {useState, useEffect} from 'react';
-import Image from 'react-bootstrap/Image';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import './AccountStyle.css'
-import { useContext } from 'react';
-import { UserContext } from '../UserContext';
-import Podcast from 'podcast-api'
 import {FaStar} from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
@@ -150,7 +146,7 @@ function Account() {
           setReviews(data.userReviews);
         })
         .catch(error => console.error('Error:', error));
-    }, []);
+    }, );
 
       const renderReviews = () => {
         if (!userReviews){
@@ -284,7 +280,7 @@ function Account() {
           setEmail(data.user.Email)
         })
         .catch(error => console.error('Error:', error));
-    }, []);
+    }, );
 
 
   return (
