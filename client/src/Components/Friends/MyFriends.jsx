@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Container, Stack } from 'react-bootstrap';
+import { Button, Container, Stack, Form } from 'react-bootstrap';
 import {useState, useEffect} from 'react';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -10,38 +10,270 @@ function MyFriends() {
     const UserID = localStorage.getItem('UserID');
     console.log('hello user: ' + UserID);
 
+    // sets the username of the current user account
     const [username, setUsername] = useState('');
     const [userReviews, setReviews] = useState([]);
 
     const [rating, setRating] = useState(null);
+
+    const [following, setFollowing] = useState([]);
     const [followers, setFollowers] = useState([]);
-    
+
+    const [friendReviews, setFriendReviews] = useState([]);
+
+    const [currentFollower, setCurrentFollower] = useState([]);
+    const [currentFollowing, setCurrentFollowing] = useState([]);
+
+    const [searchedFriendUsername, setSearchedFriendUsername] = useState('');
+    const [searchedFriendID, setSearchedFriendID] = useState('');
+
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const handleSearchChange = (e) => {
+      setSearchedFriendUsername(e.target.value);
+    };
+
     useEffect(() => {
-        fetch('/api/getFollowers', {
+      fetch('/podcast/feed', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ UserID, page: 1, limit: 1000 }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log('Friend reviews data');
+          console.log(data);
+          setFriendReviews(data);
+        })
+        .catch(error => console.error('Error:', error));
+    }, []);
+
+    useEffect(() => {
+      fetch('/api/getUserInfo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ UserID }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          console.log(data); 
+          setUsername(data.user.Username)
+          setFollowers(data.user.Followers)
+          console.log('following: ');
+          console.log(data.user.Following);
+          setFollowing(data.user.Following)
+        })
+        .catch(error => console.error('Error:', error));
+    }, []);
+
+
+
+      // Following _______________________________________________________>
+      const listofFollowing = () => {
+        return currentFollowing.map((following, index) => (
+          <Row sm={2}key = {index}>
+          
+          <Container id="followerBoxes" className="border" style={{backgroundColor: 'blue', color: 'white'}}>
+            <Row> 
+              <Col>
+                <h2>{following}</h2>
+              </Col>
+            </Row>
+          </Container>
+          </Row>
+        ));
+      };
+
+      useEffect(() => {
+        console.log('hopefully this a userid: ');
+        console.log(following);
+        const fetchFollowing = async () => {
+          const followingData = await Promise.all(
+            following.map(async (following) => {
+              const response = await fetch('/api/getUserInfo', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ UserID: following }),
+              });
+
+              const data = await response.json();
+              console.log('following data check: ');
+              console.log(data);
+              return data.user.Username;
+            })
+          );
+
+          setCurrentFollowing(followingData);
+        };
+
+        fetchFollowing();
+      }, [following]);
+      // Following _______________________________________________________>
+
+      // Follower List ---------------------------------------------------->
+      useEffect(() => {
+        console.log('hopefully this a followers now: ');
+        console.log(followers);
+        const fetchFollowers = async () => {
+          const followerData = await Promise.all(
+            followers.map(async (follower) => {
+              const response = await fetch('/api/getUserInfo', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ UserID: follower }),
+              });
+
+              const data = await response.json();
+              return data.user.Username;
+            })
+          );
+
+          setCurrentFollower(followerData);
+        };
+
+        fetchFollowers();
+      }, [followers]);
+
+
+      const listofFollowers = () => {
+        return currentFollower.map((follower, index) => (
+          <Row sm={2} key = {index}>
+          <Container id="followerBoxes" className=" border" style={{backgroundColor: 'blue', color: 'white'}}>
+            <Row>
+              <Col lg={10}>
+                <h2>{follower}</h2>
+              </Col>
+            </Row>
+          </Container>
+          </Row>
+        ));
+      };
+      // End of Follower List ---------------------------------------------------->
+
+      const fetchFriendID = async (usage) => {
+        console.log('searched friend: ' + searchedFriendID);
+        fetch('/api/SearchUser', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ UserID, page: 1, limit: 10 }),
+          body: JSON.stringify({ MyUser: username, Username: searchedFriendUsername}),
         })
           .then(response => response.json())
           .then(data => {
+            console.log('Friend ID Data')
             console.log(data);
-            setFollowers(data.followers);
+            if (usage === 1){
+              if (data.length === 0){
+                console.log('User not found');
+                setErrorMessage('!User not found!');
+                return;
+              }
+              const friendID = data[0]._id;
+              setSearchedFriendID(data[0]._id);
+              if (searchedFriendUsername === data[0].Username){
+                setFriendingMessage('');
+                fetchFriendReviews(friendID);
+              } else {
+                console.log('User not found');
+                setErrorMessage('!User not found!');
+              }
+            } else if (usage === 2){
+              if (data.length === 0){
+                console.log('User not found');
+                setFriendingMessage('!User not found!');
+                return;
+              }
+              const friendID = data[0]._id;
+              setSearchedFriendID(data[0]._id);
+              if (searchedFriendUsername === data[0].Username){
+                setFriendingMessage('');
+                fetchToggleFriend(friendID);
+              } else {
+                console.log('User not found');
+                setFriendingMessage('!User not found!');
+              }
+            }
+            
           })
           .catch(error => console.error('Error:', error));
-      }, []);
+      };
 
-    
+      const fetchFriendReviews = async (friendID) => {
+        console.log('searched friendID: ');
+        console.log(searchedFriendID);
+          fetch('/podcast/userReviews', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ UserID: friendID, page: 1, limit: 10 }),
+          })
+            .then(response => response.json())
+            .then(data => {
+              console.log('FetchReview Data')
+              console.log(data);
+              setFriendReviews(data.userReviews);
+            })
+            .catch(error => console.error('Error:', error));
+      };
+
+      const handleFollowSearchChange = (e) => {
+        setToggleFriendUsername(e.target.value);
+      };
+
+      const [toggleFriendUsername, setToggleFriendUsername] = useState('');
+      const [friendingMessage, setFriendingMessage] = useState('');
+
+      const fetchToggleFriend = async (friendID) => {
+        try {
+          const response = await fetch('/api/followUnfollowToggle', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              UserID,
+              targetUserID: friendID,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            throw new Error(data.error);
+          }
+
+          console.log(data.message);
+          window.location.reload();
+          setFriendingMessage(data.message)
+        } catch (error) {
+          setFriendingMessage(error.message);
+          console.error('Error:', error);
+        }
+      };
+  
+
+
+
+      // start of render reviews ===============================================>
       const renderReviews = () => {
-        if (!followers){
+        if (!friendReviews){
           // if there are no reviews
-          <p1> No user reviews yet </p1>
+          <p1> No friend reviews yet </p1>
           console.log('no reviews');
           return null;
         }
-        return followers.map((reviewItem, index) => (
-            <Container key={index} id="reviewBoxes" className="my-3 p-3 border" style={{backgroundColor: 'blue', color: 'white'}}>   
+        return friendReviews.map((reviewItem, index) => (
+            <Container lg={3} key={index} id="reviewBoxes" className="my-3 p-3 border" style={{backgroundColor: 'white', color: 'black'}}>   
             <Row>
               <Col lg={10}>
                 <h2>{reviewItem.Username}</h2>
@@ -56,7 +288,7 @@ function MyFriends() {
                                                 value={currentRating}
                                             />
                                             <FaStar id = 'star' 
-                                                size={10} 
+                                                size={15} 
                                                 color = {'yellow'}
                                             /> 
                                         </label>
@@ -70,23 +302,9 @@ function MyFriends() {
         ));
 
     };
+    // end of renderReviews ===============================================>
 
-    
-    useEffect(() => {
-      fetch('/api/getUserInfo', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ UserID }),
-      })
-        .then(response => response.json())
-        .then(data => {
-          console.log(data); 
-          setUsername(data.user.Username)
-        })
-        .catch(error => console.error('Error:', error));
-    }, []);
+  
 
 
   return (
@@ -94,14 +312,65 @@ function MyFriends() {
       <Row>
         <Col sm={3} className="d-flex justify-content-center" style={{borderColor: 'black' ,borderRight: '2px solid black' }}>
           <Stack gap={5} className ="text-center">
-            <h1>Hello, {username}</h1>
-            <Button className = "d-inline-block align-self-center"  variant="primary">Friends Password</Button>
+            <h1>Hello, {username} these are your friends!</h1>
+            <Form className="d-flex my-4" onSubmit={(e) => e.preventDefault()} >
+                <Form.Control
+                  type="search"
+                  placeholder="Follow/Unfollow a friend by username"
+                  className="me-2"
+                  aria-label="Search"
+                  onChange={handleSearchChange}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      event.preventDefault();
+                      fetchFriendID(2);
+                    }
+                  }}
+                />
+                <Button variant="outline-light" onClick={() => fetchFriendID(2)}>Enter</Button>
+              </Form>
+              {friendingMessage && <p>{friendingMessage}</p>}
+            <h1 >Following:</h1>
+            {listofFollowing()}
+            <h1 >Followers:</h1>
+            {listofFollowers()}
+              
           </Stack>
         </Col>
 
 
-          <Col className="border-right">
-            {renderReviews()}
+          <Col sm={8} className="border-right">
+            <Row>
+              <h1> Your Friend Reviews</h1>
+            </Row>
+            <Row>
+              <Form className="d-flex my-4" onSubmit={(e) => e.preventDefault()} >
+                <Form.Control
+                  type="search"
+                  placeholder="Search for a friend's reviews by username"
+                  className="me-2"
+                  aria-label="Search"
+                  onChange={handleSearchChange}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      event.preventDefault();
+                      fetchFriendID();
+                    }
+                  }}
+                />
+                <Button variant="outline-light" onClick={() => fetchFriendID(1)}>Search</Button>
+              </Form>
+            </Row>
+            <Row>
+              <Col className="col-auto">
+                   {errorMessage && <p>{errorMessage}</p>}
+                  <Button variant="secondary" onClick={() => window.location.reload()}>Refresh All Friends' Reviews</Button>
+              </Col>
+            </Row>
+            <Row>
+                {renderReviews()}
+                
+            </Row>
           </Col> 
       </Row>
       

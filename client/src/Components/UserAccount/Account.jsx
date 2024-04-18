@@ -9,6 +9,8 @@ import { useContext } from 'react';
 import { UserContext } from '../UserContext';
 import Podcast from 'podcast-api'
 import {FaStar} from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+
 
 
 // import { useLocation } from 'react-router-dom';
@@ -21,6 +23,8 @@ function Account() {
     // useEffect(() => {
     //   console.log(UserID);
     // }, [UserID]);
+
+    const navigate = useNavigate();
 
     const UserID = localStorage.getItem('UserID');
     
@@ -66,6 +70,15 @@ function Account() {
 
     const handleInputChange = (event) => {
       setNewReview(event.target.value);
+    };
+
+
+    const handleLogout = () => {
+      // Remove the user's token from local storage (or state)
+      localStorage.removeItem('token');
+
+      // Redirect the user to the login page
+      navigate('/');
     };
 
 
@@ -170,8 +183,8 @@ function Account() {
                                 </Container>
                 <p>{reviewItem.Comment}</p>
               </Col>
-              <Col className="mr-3 d-flex justify-content-center flex-column">
-                <Row className = "mr-3 mb-3">
+              <Col className=" d-flex justify-content-center flex-column">
+                <Row className = "mb-3">
                   <Button variant="info" onClick={() => 
                   handlePopup(reviewItem._id, reviewItem.Podcast, reviewItem.Rating, reviewItem.Comment)
                   } style= {{maxWidth: '150px'}}>Edit Review</Button>
@@ -282,6 +295,7 @@ function Account() {
             <h1>Hello, {username}</h1>
             <h6> Email: {userEmail} </h6>
             <Button className = "d-inline-block align-self-center" onClick={handleShowEnterCurrentPasswordModal} variant="primary">Change Password</Button>
+            <Button className = "d-inline-block align-self-center" onClick={handleLogout} variant="secondary">Logout</Button>
           </Stack>
 
           <Modal show = {enterCurrentPasswordModal} onHide = {handleCloseEnterCurrentPasswordModal} centered>
@@ -338,7 +352,7 @@ function Account() {
         </Col>
 
 
-          <Col className="border-right">
+          <Col sm={8} className="border-right">
             {renderReviews()}
           </Col> 
       </Row>
