@@ -174,24 +174,26 @@ function MyFriends() {
             if (usage === 1){
               if (data.length === 0){
                 console.log('User not found');
-                setErrorMessage('!User not found!');
+                setErrorMessage('User not found!');
                 return;
               }
+              // For getting id of the person you want reviews
               const friendID = data[0]._id;
               setSearchedFriendID(data[0]._id);
               if (searchedFriendUsername === data[0].Username){
-                setFriendingMessage('');
+                setErrorMessage('');
                 fetchFriendReviews(friendID);
               } else {
                 console.log('User not found');
-                setErrorMessage('!User not found!');
+                setErrorMessage('User not found!');
               }
             } else if (usage === 2){
               if (data.length === 0){
                 console.log('User not found');
-                setFriendingMessage('!User not found!');
+                setFriendingMessage('User not found!');
                 return;
               }
+              // For gettiing the id of the user you want to follow
               const friendID = data[0]._id;
               setSearchedFriendID(data[0]._id);
               if (searchedFriendUsername === data[0].Username){
@@ -199,7 +201,7 @@ function MyFriends() {
                 fetchToggleFriend(friendID);
               } else {
                 console.log('User not found');
-                setFriendingMessage('!User not found!');
+                setFriendingMessage('User not found!');
               }
             }
             
@@ -354,7 +356,7 @@ function MyFriends() {
                   onKeyDown={(event) => {
                     if (event.key === 'Enter') {
                       event.preventDefault();
-                      fetchFriendID();
+                      fetchFriendID(1);
                     }
                   }}
                 />
