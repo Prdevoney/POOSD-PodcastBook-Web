@@ -282,10 +282,10 @@ function handleLoginClick(event) {
               }}>Sign Up</a>
           </p>
           <p className='text-right mt-2'>
-            <a href='#' onClick={(event) => {
+            <Button onClick={(event) => {
                 event.preventDefault(); // Prevent the default anchor link behavior
                 setShowModalPass(true);    // Open the modal
-            }}>forgot password?</a>
+            }}>forgot password?</Button>
           </p>
           
         </form>
