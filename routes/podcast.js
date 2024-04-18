@@ -197,7 +197,6 @@ router.post('/podcastReviews', async (req, res) => {
     const db = client.db("Podcast");
     const collection = db.collection('Review');
 
-    
     // Perform a case-insensitive search for reviews with the same Podcast name
     const query = { Podcast: { $regex: new RegExp(Podcast, 'i') } };
 

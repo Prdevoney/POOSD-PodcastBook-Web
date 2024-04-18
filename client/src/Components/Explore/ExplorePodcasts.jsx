@@ -26,7 +26,7 @@ console.log('UserID: ', userId);
 const ExplorePodcasts =() =>{
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchType, setSearchType] = useState('podcast');
+  const [searchType] = useState('podcast');
   const [lastSearchType, setLastSearchType] = useState('podcast');
   const [podcasts, setPodcasts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -40,31 +40,31 @@ const ExplorePodcasts =() =>{
     setSearchQuery(e.target.value);
   };
 
-  const handleTypeChange = (e) => {
-    setSearchType(e.target.value);
-  };
-const handleCurrentEpisode = (currEpisode) => {
-    console.log("Episode data received:", currEpisode);
+  // const handleTypeChange = (e) => {
+  //   setSearchType(e.target.value);
+  // };
+// const handleCurrentEpisode = (currEpisode) => {
+//     console.log("Episode data received:", currEpisode);
 
-    const date = new Date(currEpisode.pub_date_ms);
-    const formattedDate = date.toLocaleDateString("en-US", {
-        weekday: 'long', 
-        year: 'numeric', 
-        month: 'long', 
-        day: 'numeric' 
-    }) + ' ' + date.toLocaleTimeString("en-US", {
-        hour: '2-digit', 
-        minute: '2-digit' 
-    });
+//     const date = new Date(currEpisode.pub_date_ms);
+//     const formattedDate = date.toLocaleDateString("en-US", {
+//         weekday: 'long', 
+//         year: 'numeric', 
+//         month: 'long', 
+//         day: 'numeric' 
+//     }) + ' ' + date.toLocaleTimeString("en-US", {
+//         hour: '2-digit', 
+//         minute: '2-digit' 
+//     });
 
-    const updatedEpisode = {
-        ...currEpisode,
-        pub_date_ms: formattedDate 
-    };
+//     const updatedEpisode = {
+//         ...currEpisode,
+//         pub_date_ms: formattedDate 
+//     };
 
-    setCurrentEpisode(updatedEpisode);
-    setShowModal(true);
-  };
+//     setCurrentEpisode(updatedEpisode);
+//     setShowModal(true);
+//   };
 
   const handleReview = (data) => {
     const dataForReview = normalizeData(data);
@@ -88,22 +88,22 @@ const handleCurrentEpisode = (currEpisode) => {
     return normalizedData;
   };
 
-  const getEpisode = async (podcastId) => {
+  // const getEpisode = async (podcastId) => {
 
-    const client = Client({ apiKey: API_KEY });
-    try{
-      const response = await client.fetchPodcastById({
-        id: podcastId,
-        sort: 'recent_first',
-      });
+  //   const client = Client({ apiKey: API_KEY });
+  //   try{
+  //     const response = await client.fetchPodcastById({
+  //       id: podcastId,
+  //       sort: 'recent_first',
+  //     });
 
-      console.log('Episodes:', response.data.episodes);
-      handleCurrentEpisode(response.data.episodes[0]);
+  //     console.log('Episodes:', response.data.episodes);
+  //     handleCurrentEpisode(response.data.episodes[0]);
 
-    } catch(error){
-      console.error('Error fetching podcasts:', error);
-    }
-  };
+  //   } catch(error){
+  //     console.error('Error fetching podcasts:', error);
+  //   }
+  // };
 
   const fetchPodcasts = async () => {
     setIsLoading(true);
@@ -223,10 +223,10 @@ const handleCurrentEpisode = (currEpisode) => {
 
         <Form className="d-flex mb-4" onSubmit={(e) => e.preventDefault()} >
           
-          <Form.Select className = "me-3" variant="primary" style={{width: '110px'}} aria-label="Default select example" value={searchType} onChange={handleTypeChange}>
+          {/* <Form.Select className = "me-3" variant="primary" style={{width: '110px'}} aria-label="Default select example" value={searchType} onChange={handleTypeChange}>
             <option value="podcast">Podcast</option>
             <option value="episode">Episode</option>
-          </Form.Select>
+          </Form.Select> */}
 
           <Form.Control
             type="search"
@@ -265,7 +265,7 @@ const handleCurrentEpisode = (currEpisode) => {
                             <Image src={podcast.image} alt="podcast thumbnail" className="img-thumbnail mb-3"/>
                             <h5>Podcast: {podcast.title_original}</h5>
                             <p dangerouslySetInnerHTML={{ __html: podcast.description_highlighted.length > 150 ? podcast.description_highlighted.substring(0, 150) + '...' : podcast.description_highlighted }}></p>
-                            <Button variant="outline-primary" className="mt-auto" onClick={() => getEpisode(podcast.id)}>Listen to Latest Episode</Button>
+                            {/* <Button variant="outline-primary" className="mt-auto" onClick={() => getEpisode(podcast.id)}>Listen to Latest Episode</Button> */}
                             <Button className="mt-2" variant="primary" onClick={() => handleReview(podcast)}>Review Podcast</Button>
                           </Card>
                         </Col>
@@ -292,7 +292,7 @@ const handleCurrentEpisode = (currEpisode) => {
                               <Image src={episode.image} alt="episode thumbnail" className="img-thumbnail mb-3"/>
                               <h5>Episode: {episode.title_original}</h5>
                               <p dangerouslySetInnerHTML={{ __html: episode.description_highlighted.length > 150 ? episode.description_highlighted.substring(0, 150) + '...': episode.description_highlighted }}></p>
-                              <Button variant="outline-primary" className="mt-auto" onClick={() => handleCurrentEpisode(episode)}>Play Episode</Button>
+                              {/* <Button variant="outline-primary" className="mt-auto" onClick={() => handleCurrentEpisode(episode)}>Play Episode</Button> */}
                               <Button className="mt-2" variant="primary" onClick={() => handleReview(episode)}>Review Episode</Button>
 
                             </Card>
@@ -322,7 +322,7 @@ const handleCurrentEpisode = (currEpisode) => {
                             <h5>Podcast: {podcast.title}</h5>
                             <p>Language: {podcast.language}</p>
                             <p dangerouslySetInnerHTML={{ __html: podcast.description.length > 150 ? podcast.description.substring(0, 150) + '...' : podcast.description }}></p>
-                            <Button variant="outline-primary" className="mt-auto" onClick={() => getEpisode(podcast.id)}>Listen to Latest Episode</Button>
+                            {/* <Button variant="outline-primary" className="mt-auto" onClick={() => getEpisode(podcast.id)}>Listen to Latest Episode</Button> */}
                             <Button className="mt-2" variant="primary" onClick={() => handleReview(podcast)}>Review this Podcast</Button>
                           </Card>
                         </Col>

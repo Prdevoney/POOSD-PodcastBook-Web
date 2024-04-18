@@ -8,10 +8,10 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 /* WHEN WE DEPLOY SWITCH TO THIS BASEURL */
-// const baseurl = 'https://mypodcastbook.com/api'
+const baseurl = 'https://mypodcastbook.com/api'
 
 /* THIS IS FOR LOCAL TESTING */
-const baseurl = 'http://localhost:5000/api'
+// const baseurl = 'http://localhost:5000/api'
 
 
 export default function Form() {
