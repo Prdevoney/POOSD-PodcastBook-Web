@@ -307,12 +307,14 @@ function MyFriends() {
     // <Container>
       <Row classNamme ="justify-content-center align-items-center">
         <Col sm={3} className="d-flex justify-content-center" style={{borderColor: 'black' ,borderRight: '2px solid black' }}>
-          <Stack gap={5} style={{marginLeft: '1rem'}}className ="text-center">
+          <Stack gap={3} style={{marginLeft: '1rem'}}className ="text-center">
             <h1 style={{color: 'white'}}>Hello, {username} these are your friends!</h1>
-            <Form className="d-flex my-4 justify-content-center align-items-center" onSubmit={(e) => e.preventDefault()} >
+            <div>
+            <p style={{marginBottom: '50',color: 'black'}}>Search for a friend by username:</p>
+            <Form className="d-flex justify-content-center align-items-center" onSubmit={(e) => e.preventDefault()} >
                 <Form.Control
                   type="search"
-                  placeholder="Follow/Unfollow a friend by username"
+                  placeholder="Enter a username"
                   className="me-2 justify-content-center align-items-center"
                   aria-label="Search"
                   onChange={handleSearchChange}
@@ -326,7 +328,8 @@ function MyFriends() {
                 <Button variant="outline-light" onClick={() => fetchFriendID(2)}>Enter</Button>
               </Form>
               {friendingMessage && <p style={{fontWeight: 'bold' ,color: '#8B0000'}}>{friendingMessage}</p>}
-            <ListGroup style={{marginLeft: '1rem',width : '10rem' }}className ="justify-content-center ">
+              </div>
+            <ListGroup style={{marginLeft: '2rem',width : '10rem' }}className ="justify-content-center ">
               <ListGroup.Item variant="primary">Following: {following.length}</ListGroup.Item>
               {listofFollowing()}
               <ListGroup.Item variant="primary">Followers: {followers.length}</ListGroup.Item>
